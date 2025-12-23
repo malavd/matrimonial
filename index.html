@@ -3,91 +3,526 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Malav Dalal - Matrimony Profile</title>
+  <title>Malav Dalal - Modern Matrimony Experience</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-content">
-      <!-- Replace "images/profile.jpg" with the path to your photo -->
-      <img src="images/profile.jpeg" alt="Malav Dalal" class="profile-pic" />
-      <h1>Malav Dalal</h1>
-      <p class="tagline">Seeking a life partner for a joyful journey ahead</p>
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <!-- Particles Background -->
+  <div id="particles-js"></div>
+
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <div class="nav-logo">MD</div>
+    <ul class="nav-menu">
+      <li><a href="#hero" class="nav-link">Home</a></li>
+      <li><a href="#about" class="nav-link">About</a></li>
+      <li><a href="#journey" class="nav-link">Journey</a></li>
+      <li><a href="#lifestyle" class="nav-link">Lifestyle</a></li>
+      <li><a href="#values" class="nav-link">Values</a></li>
+      <li><a href="#partner" class="nav-link">Partner</a></li>
+      <li><a href="#contact" class="nav-link">Connect</a></li>
+    </ul>
+    <button class="nav-burger" id="navBurger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+
+  <!-- Hero Section with 3D Parallax -->
+  <header class="hero" id="hero">
+    <div class="hero-layers">
+      <div class="hero-layer hero-bg"></div>
+      <div class="hero-content">
+        <div class="profile-container" data-tilt>
+          <div class="profile-border">
+            <img src="images/profile.jpeg" alt="Malav Dalal" class="profile-pic" />
+            <div class="status-indicator">
+              <span class="pulse"></span>
+              Available
+            </div>
+          </div>
+        </div>
+        <h1 class="hero-title">
+          <span class="text-reveal">Malav Dalal</span>
+        </h1>
+        <p class="hero-subtitle">
+          <span class="typing-text"></span>
+          <span class="cursor">|</span>
+        </p>
+        <div class="hero-stats">
+          <div class="stat-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>Michigan, USA</span>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-briefcase"></i>
+            <span>Sr Engineer</span>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-graduation-cap"></i>
+            <span>MS Engineer</span>
+          </div>
+        </div>
+        <a href="#about" class="cta-button">
+          Discover My Story
+          <i class="fas fa-arrow-down"></i>
+        </a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="mouse">
+        <div class="wheel"></div>
+      </div>
     </div>
   </header>
 
+  <!-- About Section with Cards -->
   <main>
-    <section id="about" class="section">
-      <h2>About Me</h2>
-      <p>
-        I am Malav Dalal, a 32-year-old Automotive Systems and Software Safety Engineer from Farmington Hills, Michigan, USA. I come from a Vaishnav Vaniya - Gujarati Hindu family and am looking for a life partner who values family, culture, and mutual respect.
-      </p>
-      <p>
-        I am driven, tall, and fit professional dedicated to both career success and nurturing meaningful connections. I believe in prioritizing family and have quality time with the partner. Committed to achieve balance and fulfillment in all aspects of life. Currently working as a Sr Engineer in Polaris, I am also pursuing my entrepreneurial aspirations by building a startup on the side. In my spare time, I like to explore and cook new cuisines, get on outdoor adventures and watch sport games. I like playing Tennis, Pickle-ball, and many more. I find myself satisfied being a vegetarian, non-alcoholic and non-smoking individual.
-      </p>
+    <section id="about" class="section section-about">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">
+          <span class="title-number">01</span>
+          About Me
+          <span class="title-decoration"></span>
+        </h2>
+        <div class="about-grid">
+          <div class="about-card" data-aos="fade-right">
+            <div class="card-icon">
+              <i class="fas fa-user-circle"></i>
+            </div>
+            <h3>Who I Am</h3>
+            <p>
+              A 32-year-old Automotive Systems and Software Safety Engineer passionate about innovation and building meaningful connections. Driven by purpose, grounded in values, and always seeking growth.
+            </p>
+          </div>
+          <div class="about-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-icon">
+              <i class="fas fa-heart"></i>
+            </div>
+            <h3>My Philosophy</h3>
+            <p>
+              I believe in prioritizing family, nurturing quality relationships, and achieving balance in all life aspects. Life's greatest adventure is finding someone to share it with.
+            </p>
+          </div>
+          <div class="about-card" data-aos="fade-left" data-aos-delay="200">
+            <div class="card-icon">
+              <i class="fas fa-rocket"></i>
+            </div>
+            <h3>My Ambitions</h3>
+            <p>
+              Working at Polaris while building my own startup. I'm driven to create impact, explore new horizons, and grow both professionally and personally.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Interactive Info Cards -->
+        <div class="info-cards">
+          <div class="info-card" data-aos="zoom-in">
+            <div class="info-icon">🏠</div>
+            <h4>Origin</h4>
+            <p>Vaishnav Vaniya - Gujarati Hindu</p>
+          </div>
+          <div class="info-card" data-aos="zoom-in" data-aos-delay="100">
+            <div class="info-icon">🌱</div>
+            <h4>Lifestyle</h4>
+            <p>Vegetarian, Non-smoking, Health-conscious</p>
+          </div>
+          <div class="info-card" data-aos="zoom-in" data-aos-delay="200">
+            <div class="info-icon">💪</div>
+            <h4>Physical</h4>
+            <p>Tall, Fit & Athletic</p>
+          </div>
+          <div class="info-card" data-aos="zoom-in" data-aos-delay="300">
+            <div class="info-icon">🎯</div>
+            <h4>Personality</h4>
+            <p>Driven, Caring & Balanced</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="family" class="section">
-      <h2>Family Background</h2>
-      <p>
-        My family is well-educated, values driven and resides in Ahmedabad, Gujarat. My father is a Business owner, and my mother is a Home-maker. I have 1 younger brother who is engineer and working at Amazon in Austin, TX.
-      </p>
-      <!-- Replace "images/family.jpg" with your family photo (optional) -->
-      <img src="images/family.jpeg" alt="Family Photo" class="family-pic" />
+    <!-- Life Journey Timeline -->
+    <section id="journey" class="section section-journey">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">
+          <span class="title-number">02</span>
+          My Journey
+          <span class="title-decoration"></span>
+        </h2>
+        <div class="timeline">
+          <div class="timeline-item" data-aos="fade-right">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <span class="timeline-year">2017</span>
+              <h3>Academic Milestone</h3>
+              <p>Completed MS in Mechanical Engineering from University of Texas at Arlington</p>
+            </div>
+          </div>
+          <div class="timeline-item" data-aos="fade-left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <span class="timeline-year">2017-Present</span>
+              <h3>Professional Growth</h3>
+              <p>Evolved into Sr. Systems Engineer, Functional Safety at Polaris Industries Inc</p>
+            </div>
+          </div>
+          <div class="timeline-item" data-aos="fade-right">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <span class="timeline-year">Current</span>
+              <h3>Entrepreneurial Path</h3>
+              <p>Building a startup alongside my career, pursuing passion projects</p>
+            </div>
+          </div>
+          <div class="timeline-item" data-aos="fade-left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+              <span class="timeline-year">Future</span>
+              <h3>Next Chapter</h3>
+              <p>Seeking a life partner to share dreams, adventures, and build a beautiful future together</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="education" class="section">
-      <h2>Education & Career</h2>
-      <ul>
-        <li><strong>Education:</strong> Masters in Mechanical Engineering (2017), University of Texas at Arlington</li>
-        <li><strong>Current Role:</strong> Sr. Systems Engineer, Functional Safety at Polaris Industries Inc</li>
-        <li><strong>Work Location:</strong> Novi, Michigan, USA</li>
-      </ul>
+    <!-- Family Section with Hover Effects -->
+    <section id="family" class="section section-family">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">
+          <span class="title-number">03</span>
+          Family Roots
+          <span class="title-decoration"></span>
+        </h2>
+        <div class="family-content">
+          <div class="family-text" data-aos="fade-right">
+            <p class="lead-text">
+              Coming from a well-educated, values-driven family based in Ahmedabad, Gujarat. 
+              Family is the cornerstone of my life, providing strength, guidance, and unconditional love.
+            </p>
+            <div class="family-members">
+              <div class="member-card">
+                <i class="fas fa-male"></i>
+                <h4>Father</h4>
+                <p>Business Owner</p>
+              </div>
+              <div class="member-card">
+                <i class="fas fa-female"></i>
+                <h4>Mother</h4>
+                <p>Home-maker</p>
+              </div>
+              <div class="member-card">
+                <i class="fas fa-user"></i>
+                <h4>Brother</h4>
+                <p>Engineer at Amazon, Austin TX</p>
+              </div>
+            </div>
+          </div>
+          <div class="family-image" data-aos="fade-left">
+            <div class="image-frame">
+              <img src="images/family.jpeg" alt="Family Photo" />
+              <div class="frame-overlay"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="interests" class="section">
-      <h2>Interests & Lifestyle</h2>
-      <ul>
-        <li><strong>Hobbies:</strong> reading, cooking, tennis, travel</li>
-        <li><strong>Preferred Cuisine:</strong> Indian, especially Gujarati food</li>
-        <li><strong>Lifestyle:</strong> vegetarian, non-smoker, moderate drinker or teetotaler</li>
-      </ul>
+    <!-- Lifestyle Gallery -->
+    <section id="lifestyle" class="section section-lifestyle">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">
+          <span class="title-number">04</span>
+          Lifestyle & Passions
+          <span class="title-decoration"></span>
+        </h2>
+        <div class="lifestyle-grid">
+          <div class="lifestyle-card" data-aos="flip-left">
+            <div class="card-front">
+              <i class="fas fa-utensils"></i>
+              <h3>Culinary Explorer</h3>
+            </div>
+            <div class="card-back">
+              <p>Passionate about cooking and exploring new cuisines, with a special love for Gujarati and Indian flavors</p>
+            </div>
+          </div>
+          <div class="lifestyle-card" data-aos="flip-left" data-aos-delay="100">
+            <div class="card-front">
+              <i class="fas fa-table-tennis"></i>
+              <h3>Sports Enthusiast</h3>
+            </div>
+            <div class="card-back">
+              <p>Active player of Tennis and Pickleball. Love watching sports and staying physically fit</p>
+            </div>
+          </div>
+          <div class="lifestyle-card" data-aos="flip-left" data-aos-delay="200">
+            <div class="card-front">
+              <i class="fas fa-plane"></i>
+              <h3>Adventure Seeker</h3>
+            </div>
+            <div class="card-back">
+              <p>Outdoor adventures and travel fuel my spirit. Always ready to explore new destinations</p>
+            </div>
+          </div>
+          <div class="lifestyle-card" data-aos="flip-left" data-aos-delay="300">
+            <div class="card-front">
+              <i class="fas fa-book"></i>
+              <h3>Continuous Learner</h3>
+            </div>
+            <div class="card-back">
+              <p>Love reading and expanding knowledge across technology, business, and personal development</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="partner" class="section">
-      <h2>About My Partner</h2>
-      <p>I am looking for someone who is:</p>
-      <ul>
-        <li>Between age 28–33 years old</li>
-        <li>From Hindu</li>
-        <li>Well-educated and career-oriented</li>
-        <li>Family-oriented, respectful, and emotionally mature</li>
-        <li>Comfortable with US lifestyle, occasional travel to India</li>
-      </ul>
-      <p>I value mutual understanding, shared values, and a strong emotional connection.</p>
+    <!-- Values Visualization -->
+    <section id="values" class="section section-values">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">
+          <span class="title-number">05</span>
+          Core Values
+          <span class="title-decoration"></span>
+        </h2>
+        <div class="values-container">
+          <div class="value-item" data-aos="zoom-in" style="--delay: 0s">
+            <div class="value-circle">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" class="circle-bg"></circle>
+                <circle cx="50" cy="50" r="45" class="circle-progress" data-progress="95"></circle>
+              </svg>
+              <div class="value-icon">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <h3>Family First</h3>
+            <p>Deep commitment to family values and relationships</p>
+          </div>
+          <div class="value-item" data-aos="zoom-in" style="--delay: 0.2s">
+            <div class="value-circle">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" class="circle-bg"></circle>
+                <circle cx="50" cy="50" r="45" class="circle-progress" data-progress="90"></circle>
+              </svg>
+              <div class="value-icon">
+                <i class="fas fa-balance-scale"></i>
+              </div>
+            </div>
+            <h3>Work-Life Balance</h3>
+            <p>Striving for harmony between career and personal life</p>
+          </div>
+          <div class="value-item" data-aos="zoom-in" style="--delay: 0.4s">
+            <div class="value-circle">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" class="circle-bg"></circle>
+                <circle cx="50" cy="50" r="45" class="circle-progress" data-progress="92"></circle>
+              </svg>
+              <div class="value-icon">
+                <i class="fas fa-handshake"></i>
+              </div>
+            </div>
+            <h3>Mutual Respect</h3>
+            <p>Building relationships on trust and understanding</p>
+          </div>
+          <div class="value-item" data-aos="zoom-in" style="--delay: 0.6s">
+            <div class="value-circle">
+              <svg viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" class="circle-bg"></circle>
+                <circle cx="50" cy="50" r="45" class="circle-progress" data-progress="88"></circle>
+              </svg>
+              <div class="value-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+            <h3>Growth Mindset</h3>
+            <p>Continuous personal and professional development</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section id="contact" class="section">
-      <h2>Contact</h2>
-      <p>
-        If you or someone you know feels we could be a good match, please feel free to reach out:
-      </p>
-      <ul>
-        <!-- Replace with your real email -->
-        <li>Email: <a href="mailto:malavdalal@yahoo.com">malavdalal@yahoo.com</a></li>
-        <!-- Replace with your phone number -->
-        <li>Phone: +1-214-517-7707</li>
-        <!-- Replace with your current location -->
-        <li>Location: Farmington Hills, Michigan</li>
-      </ul>
+    <!-- Partner Expectations -->
+    <section id="partner" class="section section-partner">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">
+          <span class="title-number">06</span>
+          My Ideal Partner
+          <span class="title-decoration"></span>
+        </h2>
+        <div class="partner-intro" data-aos="fade-up">
+          <p class="lead-text">
+            Seeking a life partner who complements my journey - someone with whom I can build 
+            a future filled with love, laughter, mutual growth, and shared dreams.
+          </p>
+        </div>
+        <div class="partner-grid">
+          <div class="partner-card" data-aos="fade-up">
+            <div class="partner-card-header">
+              <i class="fas fa-calendar-alt"></i>
+              <h3>Age Range</h3>
+            </div>
+            <p>28-33 years old</p>
+          </div>
+          <div class="partner-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="partner-card-header">
+              <i class="fas fa-om"></i>
+              <h3>Background</h3>
+            </div>
+            <p>Hindu, preferably from similar cultural values</p>
+          </div>
+          <div class="partner-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="partner-card-header">
+              <i class="fas fa-graduation-cap"></i>
+              <h3>Education</h3>
+            </div>
+            <p>Well-educated and career-oriented</p>
+          </div>
+          <div class="partner-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="partner-card-header">
+              <i class="fas fa-heart"></i>
+              <h3>Values</h3>
+            </div>
+            <p>Family-oriented, emotionally mature</p>
+          </div>
+          <div class="partner-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="partner-card-header">
+              <i class="fas fa-globe-americas"></i>
+              <h3>Lifestyle</h3>
+            </div>
+            <p>Comfortable with US lifestyle, open to India visits</p>
+          </div>
+          <div class="partner-card" data-aos="fade-up" data-aos-delay="500">
+            <div class="partner-card-header">
+              <i class="fas fa-puzzle-piece"></i>
+              <h3>Connection</h3>
+            </div>
+            <p>Strong emotional bond and mutual understanding</p>
+          </div>
+        </div>
+        
+        <!-- Compatibility Quiz CTA -->
+        <div class="quiz-cta" data-aos="zoom-in">
+          <h3>Are We Compatible?</h3>
+          <p>Take a quick interactive quiz to see if we might be a good match!</p>
+          <button class="quiz-button" id="startQuiz">
+            <i class="fas fa-clipboard-check"></i>
+            Start Compatibility Quiz
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section section-contact">
+      <div class="container">
+        <h2 class="section-title" data-aos="fade-up">
+          <span class="title-number">07</span>
+          Let's Connect
+          <span class="title-decoration"></span>
+        </h2>
+        <div class="contact-content">
+          <div class="contact-text" data-aos="fade-right">
+            <p class="lead-text">
+              If you or someone you know feels we could be a good match, I'd love to connect. 
+              Let's start a conversation and see where it leads!
+            </p>
+            <div class="contact-methods">
+              <a href="mailto:malavdalal@yahoo.com" class="contact-card">
+                <i class="fas fa-envelope"></i>
+                <div>
+                  <h4>Email</h4>
+                  <p>malavdalal@yahoo.com</p>
+                </div>
+              </a>
+              <a href="tel:+12145177707" class="contact-card">
+                <i class="fas fa-phone"></i>
+                <div>
+                  <h4>Phone</h4>
+                  <p>+1-214-517-7707</p>
+                </div>
+              </a>
+              <div class="contact-card">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                  <h4>Location</h4>
+                  <p>Farmington Hills, Michigan</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="contact-form" data-aos="fade-left">
+            <form id="contactForm">
+              <div class="form-group">
+                <input type="text" id="name" required>
+                <label for="name">Your Name</label>
+              </div>
+              <div class="form-group">
+                <input type="email" id="email" required>
+                <label for="email">Your Email</label>
+              </div>
+              <div class="form-group">
+                <input type="tel" id="phone">
+                <label for="phone">Phone Number (Optional)</label>
+              </div>
+              <div class="form-group">
+                <textarea id="message" rows="5" required></textarea>
+                <label for="message">Your Message</label>
+              </div>
+              <button type="submit" class="submit-button">
+                Send Message
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <footer>
-    <p>© 2025 Malav Dalal. Designed with care.</p>
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p>© 2025 Malav Dalal. Crafted with care and purpose.</p>
+      <div class="footer-links">
+        <a href="#hero">Back to Top</a>
+      </div>
+    </div>
   </footer>
 
+  <!-- Quiz Modal -->
+  <div class="modal" id="quizModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeQuiz">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="quiz-container">
+        <h2>Compatibility Quiz</h2>
+        <div id="quizQuestions"></div>
+        <div class="quiz-nav">
+          <button class="quiz-btn" id="prevBtn" style="display: none;">
+            <i class="fas fa-arrow-left"></i> Previous
+          </button>
+          <button class="quiz-btn quiz-btn-primary" id="nextBtn">
+            Next <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+        <div id="quizResult" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
