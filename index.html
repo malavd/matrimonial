@@ -22,7 +22,7 @@
 </head>
 <body>
   <!-- Theme Toggle -->
-  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+  <button type="button" class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
     <i class="fas fa-moon"></i>
   </button>
 
@@ -41,7 +41,7 @@
       <li><a href="#partner" class="nav-link">Partner</a></li>
       <li><a href="#contact" class="nav-link">Connect</a></li>
     </ul>
-    <button class="nav-burger" id="navBurger" aria-label="Toggle navigation">
+    <button type="button" class="nav-burger" id="navBurger" aria-label="Toggle navigation" aria-expanded="false">
       <span></span>
       <span></span>
       <span></span>
@@ -54,8 +54,8 @@
       <div class="hero-layer hero-bg"></div>
       <div class="hero-content">
         <div class="profile-container" data-tilt>
-          <div class="profile-border">
-            <img src="./images/profile.jpeg" alt="Malav Dalal" class="profile-pic" />
+            <div class="profile-border">
+            <img src="./images/profile.jpeg" alt="Malav Dalal" loading="lazy" decoding="async" width="200" height="200" class="profile-pic" />
             <div class="status-indicator">
               <span class="pulse"></span>
               Available
@@ -240,7 +240,7 @@
           </div>
           <div class="family-image" data-aos="fade-left">
             <div class="image-frame">
-              <img src="./images/family.jpeg" alt="Family Photo" />
+              <img src="./images/family.jpeg" alt="Family Photo" loading="lazy" decoding="async" class="family-photo" />
               <div class="frame-overlay"></div>
             </div>
           </div>
@@ -425,7 +425,7 @@
         <div class="quiz-cta" data-aos="zoom-in">
           <h3>Are We Compatible?</h3>
           <p>Take a quick interactive quiz to see if we might be a good match!</p>
-          <button class="quiz-button" id="startQuiz">
+          <button type="button" class="quiz-button" id="startQuiz">
             <i class="fas fa-clipboard-check"></i>
             Start Compatibility Quiz
           </button>
@@ -513,17 +513,17 @@
   <!-- Quiz Modal -->
   <div class="modal" id="quizModal">
     <div class="modal-content">
-      <button class="modal-close" id="closeQuiz" aria-label="Close quiz">
+      <button type="button" class="modal-close" id="closeQuiz" aria-label="Close quiz">
         <i class="fas fa-times"></i>
       </button>
       <div class="quiz-container">
         <h2>Compatibility Quiz</h2>
         <div id="quizQuestions"></div>
         <div class="quiz-nav">
-          <button class="quiz-btn" id="prevBtn" style="display: none;">
+          <button type="button" class="quiz-btn" id="prevBtn" style="display: none;">
             <i class="fas fa-arrow-left"></i> Previous
           </button>
-          <button class="quiz-btn quiz-btn-primary" id="nextBtn">
+          <button type="button" class="quiz-btn quiz-btn-primary" id="nextBtn">
             Next <i class="fas fa-arrow-right"></i>
           </button>
         </div>
