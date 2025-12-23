@@ -1,3 +1,8 @@
+// ===== ERROR HANDLING & LIBRARY CHECKS =====
+window.addEventListener('error', (e) => {
+  console.error('Error loading resource:', e.filename || e.target?.src, e.message);
+});
+
 // ===== THEME TOGGLE =====
 const themeToggle = document.getElementById('themeToggle');
 const html = document.documentElement;
@@ -16,55 +21,63 @@ themeToggle.addEventListener('click', () => {
 
 function updateThemeIcon(theme) {
   const icon = themeToggle.querySelector('i');
-  icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+  if (icon) {
+    icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
+  }
 }
 
 // ===== PARTICLES.JS CONFIGURATION =====
-if (typeof particlesJS !== 'undefined') {
-  particlesJS('particles-js', {
-    particles: {
-      number: { value: 80, density: { enable: true, value_area: 800 } },
-      color: { value: '#d4af37' },
-      shape: { type: 'circle' },
-      opacity: {
-        value: 0.5,
-        random: true,
-        anim: { enable: true, speed: 1, opacity_min: 0.1 }
+try {
+  if (typeof particlesJS !== 'undefined') {
+    particlesJS('particles-js', {
+      particles: {
+        number: { value: 80, density: { enable: true, value_area: 800 } },
+        color: { value: '#d4af37' },
+        shape: { type: 'circle' },
+        opacity: {
+          value: 0.5,
+          random: true,
+          anim: { enable: true, speed: 1, opacity_min: 0.1 }
+        },
+        size: {
+          value: 3,
+          random: true,
+          anim: { enable: true, speed: 2, size_min: 0.1 }
+        },
+        line_linked: {
+          enable: true,
+          distance: 150,
+          color: '#d4af37',
+          opacity: 0.4,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 2,
+          direction: 'none',
+          random: true,
+          out_mode: 'out'
+        }
       },
-      size: {
-        value: 3,
-        random: true,
-        anim: { enable: true, speed: 2, size_min: 0.1 }
+      interactivity: {
+        detect_on: 'canvas',
+        events: {
+          onhover: { enable: true, mode: 'grab' },
+          onclick: { enable: true, mode: 'push' },
+          resize: true
+        },
+        modes: {
+          grab: { distance: 140, line_linked: { opacity: 1 } },
+          push: { particles_nb: 4 }
+        }
       },
-      line_linked: {
-        enable: true,
-        distance: 150,
-        color: '#d4af37',
-        opacity: 0.4,
-        width: 1
-      },
-      move: {
-        enable: true,
-        speed: 2,
-        direction: 'none',
-        random: true,
-        out_mode: 'out'
-      }
-    },
-    interactivity: {
-      detect_on: 'canvas',
-      events: {
-        onhover: { enable: true, mode: 'grab' },
-        onclick: { enable: true, mode: 'push' },
-        resize: true
-      },
-      modes: {
-        grab: { distance: 140, line_linked: { opacity: 1 } },
-        push: { particles_nb: 4 }
-      }
-    },
-    retina_detect: true
-  });
+      retina_detect: true
+    });
+  } else {
+    console.warn('Particles.js not loaded. Continuing without particle effects.');
+  }
+} catch (error) {
+  console.error('Particles.js initialization failed:', error);
 }
 
 // ===== NAVIGATION =====
@@ -86,14 +99,18 @@ window.addEventListener('scroll', () => {
 });
 
 // Mobile menu toggle
-navBurger.addEventListener('click', () => {
-  navMenu.classList.toggle('active');
-});
+if (navBurger && navMenu) {
+  navBurger.addEventListener('click', () => {
+    navMenu.classList.toggle('active');
+  });
+}
 
 // Close mobile menu on link click
 navLinks.forEach(link => {
   link.addEventListener('click', () => {
-    navMenu.classList.remove('active');
+    if (navMenu) {
+      navMenu.classList.remove('active');
+    }
   });
 });
 
@@ -132,6 +149,8 @@ let charIndex = 0;
 let isDeleting = false;
 
 function typeEffect() {
+  if (!typingText) return;
+  
   const currentPhrase = phrases[phraseIndex];
   
   if (isDeleting) {
@@ -167,13 +186,22 @@ window.addEventListener('scroll', () => {
 });
 
 // ===== TILT EFFECT =====
-if (typeof VanillaTilt !== 'undefined') {
-  VanillaTilt.init(document.querySelectorAll('[data-tilt]'), {
-    max: 15,
-    speed: 400,
-    glare: true,
-    'max-glare': 0.3
-  });
+try {
+  if (typeof VanillaTilt !== 'undefined') {
+    const tiltElements = document.querySelectorAll('[data-tilt]');
+    if (tiltElements.length > 0) {
+      VanillaTilt.init(tiltElements, {
+        max: 15,
+        speed: 400,
+        glare: true,
+        'max-glare': 0.3
+      });
+    }
+  } else {
+    console.warn('VanillaTilt not loaded. Continuing without tilt effects.');
+  }
+} catch (error) {
+  console.error('VanillaTilt initialization failed:', error);
 }
 
 // ===== SCROLL ANIMATIONS =====
@@ -279,83 +307,99 @@ const nextBtn = document.getElementById('nextBtn');
 const quizQuestions = document.getElementById('quizQuestions');
 const quizResult = document.getElementById('quizResult');
 
-startQuizBtn.addEventListener('click', () => {
-  quizModal.classList.add('active');
-  resetQuiz();
-  showQuestion();
-});
-
-closeQuizBtn.addEventListener('click', () => {
-  quizModal.classList.remove('active');
-});
-
-quizModal.addEventListener('click', (e) => {
-  if (e.target === quizModal) {
-    quizModal.classList.remove('active');
-  }
-});
-
-prevBtn.addEventListener('click', () => {
-  if (currentQuestion > 0) {
-    currentQuestion--;
-    showQuestion();
-  }
-});
-
-nextBtn.addEventListener('click', () => {
-  const selected = document.querySelector('.quiz-option.selected');
-  if (selected) {
-    answers[currentQuestion] = parseInt(selected.dataset.index);
-    
-    if (currentQuestion < quizData.length - 1) {
-      currentQuestion++;
+if (startQuizBtn) {
+  startQuizBtn.addEventListener('click', () => {
+    if (quizModal) {
+      quizModal.classList.add('active');
+      resetQuiz();
       showQuestion();
-    } else {
-      showResult();
     }
-  } else {
-    alert('Please select an option');
-  }
-});
+  });
+}
+
+if (closeQuizBtn && quizModal) {
+  closeQuizBtn.addEventListener('click', () => {
+    quizModal.classList.remove('active');
+  });
+}
+
+if (quizModal) {
+  quizModal.addEventListener('click', (e) => {
+    if (e.target === quizModal) {
+      quizModal.classList.remove('active');
+    }
+  });
+}
+
+if (prevBtn) {
+  prevBtn.addEventListener('click', () => {
+    if (currentQuestion > 0) {
+      currentQuestion--;
+      showQuestion();
+    }
+  });
+}
+
+if (nextBtn) {
+  nextBtn.addEventListener('click', () => {
+    const selected = document.querySelector('.quiz-option.selected');
+    if (selected) {
+      answers[currentQuestion] = parseInt(selected.dataset.index);
+      
+      if (currentQuestion < quizData.length - 1) {
+        currentQuestion++;
+        showQuestion();
+      } else {
+        showResult();
+      }
+    } else {
+      alert('Please select an option');
+    }
+  });
+}
 
 function resetQuiz() {
   currentQuestion = 0;
   answers = [];
-  quizQuestions.style.display = 'block';
-  quizResult.style.display = 'none';
-  nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+  if (quizQuestions) quizQuestions.style.display = 'block';
+  if (quizResult) quizResult.style.display = 'none';
+  if (nextBtn) nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
 }
 
 function showQuestion() {
   const question = quizData[currentQuestion];
   
-  quizQuestions.innerHTML = `
-    <div class="quiz-question">
-      <h3>Question ${currentQuestion + 1} of ${quizData.length}</h3>
-      <p style="font-size: 1.2rem; margin: 1rem 0 2rem;">${question.question}</p>
-      <div class="quiz-options">
-        ${question.options.map((option, index) => `
-          <div class="quiz-option" data-index="${index}" ${answers[currentQuestion] === index ? 'class="quiz-option selected"' : ''}>
-            ${option}
-          </div>
-        `).join('')}
+  if (quizQuestions) {
+    quizQuestions.innerHTML = `
+      <div class="quiz-question">
+        <h3>Question ${currentQuestion + 1} of ${quizData.length}</h3>
+        <p style="font-size: 1.2rem; margin: 1rem 0 2rem;">${question.question}</p>
+        <div class="quiz-options">
+          ${question.options.map((option, index) => `
+            <div class="quiz-option ${answers[currentQuestion] === index ? 'selected' : ''}" data-index="${index}">
+              ${option}
+            </div>
+          `).join('')}
+        </div>
       </div>
-    </div>
-  `;
+    `;
 
-  // Add click handlers to options
-  document.querySelectorAll('.quiz-option').forEach(option => {
-    option.addEventListener('click', () => {
-      document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
-      option.classList.add('selected');
+    // Add click handlers to options
+    document.querySelectorAll('.quiz-option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+      });
     });
-  });
+  }
 
   // Update navigation buttons
-  prevBtn.style.display = currentQuestion === 0 ? 'none' : 'flex';
-  nextBtn.innerHTML = currentQuestion === quizData.length - 1 
-    ? 'See Results <i class="fas fa-check"></i>' 
-    : 'Next <i class="fas fa-arrow-right"></i>';
+  if (prevBtn) prevBtn.style.display = currentQuestion === 0 ? 'none' : 'flex';
+  if (nextBtn) {
+    nextBtn.innerHTML = currentQuestion === quizData.length - 1 
+      ? 'See Results <i class="fas fa-check"></i>' 
+      : 'Next <i class="fas fa-arrow-right"></i>';
+  }
 }
 
 function showResult() {
@@ -387,49 +431,53 @@ function showResult() {
     resultDescription = 'While we might have different preferences, compatibility is complex. If you feel there\'s a connection, I\'m open to conversation!';
   }
 
-  quizQuestions.style.display = 'none';
-  quizResult.style.display = 'block';
-  quizResult.innerHTML = `
-    <div style="font-size: 5rem; margin-bottom: 1rem;">${resultEmoji}</div>
-    <h3>${resultMessage}</h3>
-    <div class="result-score">${percentage}%</div>
-    <p style="font-size: 1.1rem; color: var(--text-light); margin: 2rem 0;">
-      ${resultDescription}
-    </p>
-    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <a href="#contact" class="quiz-btn quiz-btn-primary" onclick="document.getElementById('quizModal').classList.remove('active')">
-        Get in Touch <i class="fas fa-envelope"></i>
-      </a>
-      <button class="quiz-btn" onclick="location.reload()">
-        Retake Quiz <i class="fas fa-redo"></i>
-      </button>
-    </div>
-  `;
+  if (quizQuestions) quizQuestions.style.display = 'none';
+  if (quizResult) {
+    quizResult.style.display = 'block';
+    quizResult.innerHTML = `
+      <div style="font-size: 5rem; margin-bottom: 1rem;">${resultEmoji}</div>
+      <h3>${resultMessage}</h3>
+      <div class="result-score">${percentage}%</div>
+      <p style="font-size: 1.1rem; color: var(--text-light); margin: 2rem 0;">
+        ${resultDescription}
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="#contact" class="quiz-btn quiz-btn-primary" onclick="document.getElementById('quizModal').classList.remove('active')">
+          Get in Touch <i class="fas fa-envelope"></i>
+        </a>
+        <button class="quiz-btn" onclick="location.reload()">
+          Retake Quiz <i class="fas fa-redo"></i>
+        </button>
+      </div>
+    `;
+  }
 }
 
 // ===== CONTACT FORM =====
 const contactForm = document.getElementById('contactForm');
 
-contactForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const phone = document.getElementById('phone').value;
-  const message = document.getElementById('message').value;
+if (contactForm) {
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('name')?.value || '';
+    const email = document.getElementById('email')?.value || '';
+    const phone = document.getElementById('phone')?.value || '';
+    const message = document.getElementById('message')?.value || '';
 
-  // Create mailto link
-  const subject = encodeURIComponent(`Matrimonial Inquiry from ${name}`);
-  const body = encodeURIComponent(
-    `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\nMessage:\n${message}`
-  );
-  
-  window.location.href = `mailto:malavdalal@yahoo.com?subject=${subject}&body=${body}`;
-  
-  // Show success message
-  alert('Thank you for reaching out! Your default email client will open to send the message.');
-  contactForm.reset();
-});
+    // Create mailto link
+    const subject = encodeURIComponent(`Matrimonial Inquiry from ${name}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\nMessage:\n${message}`
+    );
+    
+    window.location.href = `mailto:malavdalal@yahoo.com?subject=${subject}&body=${body}`;
+    
+    // Show success message
+    alert('Thank you for reaching out! Your default email client will open to send the message.');
+    contactForm.reset();
+  });
+}
 
 // ===== PERFORMANCE: Lazy load images =====
 if ('IntersectionObserver' in window) {

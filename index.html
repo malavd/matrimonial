@@ -3,10 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Malav Dalal - Matrimonial Profile">
   <title>Malav Dalal - Modern Matrimony Experience</title>
-  <link rel="stylesheet" href="style.css" />
+  
+  <!-- Preconnect to external domains -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Your CSS -->
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
   <!-- Theme Toggle -->
@@ -29,7 +41,7 @@
       <li><a href="#partner" class="nav-link">Partner</a></li>
       <li><a href="#contact" class="nav-link">Connect</a></li>
     </ul>
-    <button class="nav-burger" id="navBurger">
+    <button class="nav-burger" id="navBurger" aria-label="Toggle navigation">
       <span></span>
       <span></span>
       <span></span>
@@ -43,7 +55,7 @@
       <div class="hero-content">
         <div class="profile-container" data-tilt>
           <div class="profile-border">
-            <img src="images/profile.jpeg" alt="Malav Dalal" class="profile-pic" />
+            <img src="./images/profile.jpeg" alt="Malav Dalal" class="profile-pic" />
             <div class="status-indicator">
               <span class="pulse"></span>
               Available
@@ -228,7 +240,7 @@
           </div>
           <div class="family-image" data-aos="fade-left">
             <div class="image-frame">
-              <img src="images/family.jpeg" alt="Family Photo" />
+              <img src="./images/family.jpeg" alt="Family Photo" />
               <div class="frame-overlay"></div>
             </div>
           </div>
@@ -462,19 +474,19 @@
           <div class="contact-form" data-aos="fade-left">
             <form id="contactForm">
               <div class="form-group">
-                <input type="text" id="name" required>
+                <input type="text" id="name" placeholder=" " required>
                 <label for="name">Your Name</label>
               </div>
               <div class="form-group">
-                <input type="email" id="email" required>
+                <input type="email" id="email" placeholder=" " required>
                 <label for="email">Your Email</label>
               </div>
               <div class="form-group">
-                <input type="tel" id="phone">
+                <input type="tel" id="phone" placeholder=" ">
                 <label for="phone">Phone Number (Optional)</label>
               </div>
               <div class="form-group">
-                <textarea id="message" rows="5" required></textarea>
+                <textarea id="message" rows="5" placeholder=" " required></textarea>
                 <label for="message">Your Message</label>
               </div>
               <button type="submit" class="submit-button">
@@ -491,7 +503,7 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-content">
-      <p>© 2025 Malav Dalal. Crafted with care and purpose.</p>
+      <p>&copy; 2025 Malav Dalal. Crafted with care and purpose.</p>
       <div class="footer-links">
         <a href="#hero">Back to Top</a>
       </div>
@@ -501,7 +513,7 @@
   <!-- Quiz Modal -->
   <div class="modal" id="quizModal">
     <div class="modal-content">
-      <button class="modal-close" id="closeQuiz">
+      <button class="modal-close" id="closeQuiz" aria-label="Close quiz">
         <i class="fas fa-times"></i>
       </button>
       <div class="quiz-container">
@@ -521,8 +533,8 @@
   </div>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js" integrity="sha512-wC/cunGGDjXSl9OHUH0RuqSyW4YNLlsPwhcLxwWW1CR4OeC2E1xpRnTzXHjO1abhp6cRcY+pYvzx1f/gZ0J2Dw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="./script.js"></script>
 </body>
 </html>

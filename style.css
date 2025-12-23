@@ -721,6 +721,7 @@ p {
   perspective: 1000px;
   height: 300px;
   cursor: pointer;
+  position: relative;
 }
 
 .card-front,
@@ -811,7 +812,7 @@ p {
 
 .circle-progress {
   fill: none;
-  stroke: url(#gradient);
+  stroke: var(--primary-color);
   stroke-width: 8;
   stroke-linecap: round;
   stroke-dasharray: 283;
@@ -1004,6 +1005,8 @@ p {
   color: var(--text-light);
   transition: var(--transition-smooth);
   pointer-events: none;
+  background: var(--bg-white);
+  padding: 0 0.5rem;
 }
 
 .form-group input:focus + label,
@@ -1014,8 +1017,6 @@ p {
   left: 0.5rem;
   font-size: 0.85rem;
   color: var(--primary-color);
-  background: var(--bg-white);
-  padding: 0 0.5rem;
 }
 
 .submit-button {
@@ -1125,6 +1126,7 @@ p {
   align-items: center;
   justify-content: center;
   transition: var(--transition-smooth);
+  color: var(--text-dark);
 }
 
 .modal-close:hover {
