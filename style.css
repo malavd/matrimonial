@@ -81,12 +81,12 @@ p {
   padding: 0 2rem;
 }
 
-/* ===== Theme Toggle - FIXED POSITIONING ===== */
+/* ===== Theme Toggle - VISIBILITY FIXED ===== */
 .theme-toggle {
   position: fixed;
   top: 20px;
-  right: 20px;
-  z-index: 9998; /* Below navigation (9999) but above content */
+  right: 80px; /* Moved left to avoid nav overlap */
+  z-index: 10000; /* Above navigation */
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -100,6 +100,7 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: auto;
 }
 
 .theme-toggle:hover {
@@ -189,7 +190,7 @@ p {
   background: none;
   border: none;
   cursor: pointer;
-  z-index: 10000; /* Above everything when menu is open */
+  z-index: 10000;
 }
 
 .nav-burger span {
@@ -1269,10 +1270,11 @@ p {
 
 /* ===== Responsive Design ===== */
 @media (max-width: 968px) {
-  /* Move theme toggle to avoid nav collision */
+  /* Theme toggle positioning for tablet/mobile */
   .theme-toggle {
-    top: 85px; /* Below navigation bar */
-    right: 15px;
+    top: 20px;
+    right: 70px; /* Left of hamburger menu */
+    z-index: 10000;
   }
 
   .nav-menu {
@@ -1331,12 +1333,11 @@ p {
     font-size: 14px;
   }
 
-  /* Further adjust theme toggle on smaller screens */
   .theme-toggle {
     width: 45px;
     height: 45px;
     font-size: 1rem;
-    top: 75px;
+    right: 65px;
   }
 
   .hero {
@@ -1384,8 +1385,7 @@ p {
     width: 40px;
     height: 40px;
     font-size: 0.9rem;
-    top: 70px;
-    right: 10px;
+    right: 60px;
   }
 }
 
