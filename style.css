@@ -1371,3 +1371,20 @@ p {
 [data-aos="flip-left"] {
   transform: perspective(1000px) rotateY(-45deg);
 }
+
+/* Quiz name input styling */
+#quizName {
+  transition: all 0.3s ease;
+}
+
+#quizName:focus {
+  outline: none;
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  transform: translateY(-2px);
+}
+
+#quizName::placeholder {
+  color: var(--text-light);
+  opacity: 0.6;
+}

@@ -62,21 +62,25 @@
   const sections = Array.from(document.querySelectorAll('.section, .hero'));
   const heroContent = document.querySelector('.hero-content');
 
-  // Quiz elements
+  // ===== QUIZ CONFIGURATION =====
+  // ** IMPORTANT: Replace 'YOUR_WEB3FORMS_ACCESS_KEY' with your actual Web3Forms access key **
+  const WEB3FORMS_ACCESS_KEY = '9dfc239b-cb71-4e34-838c-7cdaae4b0278';
+
+  // Quiz elements with updated selection rules
   const quizData = [
     { question: "What's your age range?", options: ["25-28", "28-31", "31-34", "34+"], weights: [0.5, 1, 1, 0.7], maxSelections: 1 },
     { question: "What's your educational background?", options: ["Undergraduate", "Master's", "PhD/Professional", "Other"], weights: [0.8, 1, 1, 0.6], maxSelections: 1 },
-    { question: "What's most important in a relationship? (Select up to 2)", options: ["Family values", "Career balance", "Personal growth", "Adventure & fun"], weights: [1, 0.9, 0.8, 0.7], maxSelections: 2 },
-    { question: "Your lifestyle preferences? (Select up to 2)", options: ["Vegetarian/Non-smoking", "Flexible diet", "Social drinker", "Party lifestyle"], weights: [1, 0.7, 0.5, 0.3], maxSelections: 2 },
+    { question: "What's most important in a relationship?", options: ["Family values", "Career balance", "Personal growth", "Adventure & fun"], weights: [1, 0.9, 0.8, 0.7], maxSelections: 999 },
+    { question: "Your lifestyle preferences?", options: ["Vegetarian/Non-smoking", "Flexible diet", "Social drinker", "Party lifestyle"], weights: [1, 0.7, 0.5, 0.3], maxSelections: 999 },
     { question: "How do you feel about living in the USA?", options: ["Love it, settled here", "Comfortable, occasional India visits", "Prefer India long-term", "Undecided"], weights: [1, 1, 0.6, 0.5], maxSelections: 1 },
-    { question: "Your career aspirations? (Select up to 2)", options: ["Established career", "Growing career", "Entrepreneurial", "Career break/transition"], weights: [1, 0.9, 1, 0.7], maxSelections: 2 },
-    { question: "Hobbies and interests? (Select up to 2)", options: ["Sports & outdoors", "Cooking & food", "Reading & learning", "Travel & culture"], weights: [1, 1, 0.9, 0.9], maxSelections: 2 },
-    { question: "Family dynamics preference? (Select up to 2)", options: ["Close-knit family", "Independent but connected", "Nuclear family focus", "Extended family"], weights: [1, 0.9, 0.8, 0.9], maxSelections: 2 }
+    { question: "Your career aspirations?", options: ["Established career", "Growing career", "Entrepreneurial", "Career break/transition"], weights: [1, 0.9, 1, 0.7], maxSelections: 2 },
+    { question: "Hobbies and interests?", options: ["Sports & outdoors", "Cooking & food", "Reading & learning", "Travel & culture"], weights: [1, 1, 0.9, 0.9], maxSelections: 999 },
+    { question: "Family dynamics preference?", options: ["Close-knit family", "Independent but connected", "Nuclear family focus", "Extended family"], weights: [1, 0.9, 0.8, 0.9], maxSelections: 1 }
   ];
 
-
-  let currentQuestion = 0;
+  let currentQuestion = -1; // Start at -1 to show name input first
   let answers = [];
+  let userName = '';
 
   const quizModal = document.getElementById('quizModal');
   const startQuizBtn = document.getElementById('startQuiz');
@@ -208,8 +212,28 @@
   if (closeQuizBtn && quizModal) closeQuizBtn.addEventListener('click', () => quizModal.classList.remove('active'));
   if (quizModal) quizModal.addEventListener('click', (e) => { if (e.target === quizModal) quizModal.classList.remove('active'); });
 
-  if (prevBtn) prevBtn.addEventListener('click', () => { if (currentQuestion > 0) { currentQuestion--; showQuestion(); } });
+  if (prevBtn) prevBtn.addEventListener('click', () => { 
+    if (currentQuestion > -1) { 
+      currentQuestion--; 
+      showQuestion(); 
+    } 
+  });
+
   if (nextBtn) nextBtn.addEventListener('click', () => {
+    // Handle name input screen
+    if (currentQuestion === -1) {
+      const nameInput = document.getElementById('quizName');
+      if (nameInput && nameInput.value.trim()) {
+        userName = nameInput.value.trim();
+        currentQuestion++;
+        showQuestion();
+      } else {
+        alert('Please enter your name to continue');
+      }
+      return;
+    }
+
+    // Handle quiz questions
     const hasSelection = answers[currentQuestion] && answers[currentQuestion].length > 0;
     
     if (hasSelection) {
@@ -220,30 +244,81 @@
         showResult();
       }
     } else {
-      const maxSelections = quizData[currentQuestion].maxSelections || 1;
-      alert(`Please select at least one option (up to ${maxSelections} allowed)`);
+      alert('Please select at least one option');
     }
   });
 
-  function resetQuiz() { currentQuestion = 0; answers = []; if (quizQuestions) quizQuestions.style.display = 'block'; if (quizResult) quizResult.style.display = 'none'; if (nextBtn) nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>'; }
+  function resetQuiz() { 
+    currentQuestion = -1; 
+    answers = []; 
+    userName = '';
+    if (quizQuestions) quizQuestions.style.display = 'block'; 
+    if (quizResult) quizResult.style.display = 'none'; 
+    if (nextBtn) nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>'; 
+  }
 
   function showQuestion() {
+    // Show name input screen first
+    if (currentQuestion === -1) {
+      if (quizQuestions) {
+        quizQuestions.innerHTML = `
+          <div class="quiz-question">
+            <h3>Welcome to the Compatibility Quiz!</h3>
+            <p style="font-size: 1.1rem; margin: 1.5rem 0; color: var(--text-light);">
+              Before we begin, please tell us your name so we can personalize your experience.
+            </p>
+            <div class="form-group" style="margin: 2rem 0;">
+              <input type="text" id="quizName" placeholder="Enter your full name" 
+                     style="width: 100%; padding: 1rem; font-size: 1.1rem; border: 2px solid var(--gold); 
+                            border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary);"
+                     autofocus>
+            </div>
+          </div>
+        `;
+        
+        // Add Enter key support
+        const nameInput = document.getElementById('quizName');
+        if (nameInput) {
+          nameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              nextBtn?.click();
+            }
+          });
+        }
+      }
+      
+      if (prevBtn) prevBtn.style.display = 'none';
+      if (nextBtn) nextBtn.innerHTML = 'Start Quiz <i class="fas fa-arrow-right"></i>';
+      return;
+    }
+
+    // Show quiz questions
     const question = quizData[currentQuestion];
     const maxSelections = question.maxSelections || 1;
+    const isUnlimited = maxSelections >= 999;
+    const isMultiple = maxSelections > 1;
+    
+    // Generate instruction text
+    let instructionText = '';
+    if (isUnlimited) {
+      instructionText = '<p style="font-size: 0.9rem; color: var(--gold); margin-bottom: 1rem;">Select all that apply</p>';
+    } else if (maxSelections > 1) {
+      instructionText = `<p style="font-size: 0.9rem; color: var(--gold); margin-bottom: 1rem;">Select up to ${maxSelections} options</p>`;
+    }
     
     if (quizQuestions) {
       quizQuestions.innerHTML = `
         <div class="quiz-question">
           <h3>Question ${currentQuestion + 1} of ${quizData.length}</h3>
           <p style="font-size: 1.2rem; margin: 1rem 0 2rem;">${question.question}</p>
-          ${maxSelections > 1 ? `<p style="font-size: 0.9rem; color: var(--gold); margin-bottom: 1rem;">Select up to ${maxSelections} options</p>` : ''}
+          ${instructionText}
           <div class="quiz-options">
             ${question.options.map((option, index) => {
               const isSelected = answers[currentQuestion] && answers[currentQuestion].includes(index);
               return `
                 <div class="quiz-option ${isSelected ? 'selected' : ''}" data-index="${index}">
                   ${option}
-                  ${maxSelections > 1 ? '<span class="checkbox-indicator"></span>' : ''}
+                  ${isMultiple ? '<span class="checkbox-indicator"></span>' : ''}
                 </div>
               `;
             }).join('')}
@@ -251,7 +326,7 @@
         </div>
       `;
       
-      // Handle option clicks with multi-select logic
+      // Handle option clicks with flexible multi-select logic
       document.querySelectorAll('.quiz-option').forEach(option => {
         option.addEventListener('click', () => {
           const index = parseInt(option.dataset.index, 10);
@@ -266,7 +341,7 @@
             option.classList.add('selected');
             answers[currentQuestion] = [index];
           } else {
-            // Multi-selection logic
+            // Multi-selection logic (limited or unlimited)
             const currentSelections = answers[currentQuestion];
             const indexPos = currentSelections.indexOf(index);
             
@@ -274,12 +349,12 @@
               // Deselect if already selected
               currentSelections.splice(indexPos, 1);
               option.classList.remove('selected');
-            } else if (currentSelections.length < maxSelections) {
-              // Select if under limit
+            } else if (isUnlimited || currentSelections.length < maxSelections) {
+              // Select if under limit or unlimited
               currentSelections.push(index);
               option.classList.add('selected');
             } else {
-              // Show message if limit reached
+              // Show message if limit reached (only for limited multi-select)
               alert(`You can select up to ${maxSelections} options only`);
             }
           }
@@ -289,6 +364,53 @@
     
     if (prevBtn) prevBtn.style.display = currentQuestion === 0 ? 'none' : 'flex';
     if (nextBtn) nextBtn.innerHTML = currentQuestion === quizData.length - 1 ? 'See Results <i class="fas fa-check"></i>' : 'Next <i class="fas fa-arrow-right"></i>';
+  }
+
+  // Submit quiz results to Web3Forms
+  async function submitQuizResults(userName, percentage, answers, resultMessage) {
+    const timestamp = new Date().toISOString();
+    
+    // Format answers for readable email
+    const formattedAnswers = answers.map((selectedIndices, questionIndex) => {
+      const question = quizData[questionIndex];
+      const selectedOptions = selectedIndices.map(idx => question.options[idx]).join(', ');
+      return `Q${questionIndex + 1}: ${question.question}\nAnswer(s): ${selectedOptions}`;
+    }).join('\n\n');
+    
+    const submissionData = {
+      access_key: WEB3FORMS_ACCESS_KEY,
+      subject: `Quiz Submission: ${userName} - ${resultMessage} (${percentage}%)`,
+      from_name: "Matrimonial Quiz System",
+      participant_name: userName,
+      quiz_score: `${percentage}%`,
+      result_message: resultMessage,
+      timestamp: timestamp,
+      detailed_answers: formattedAnswers
+    };
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(submissionData)
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        if (isDev) console.log('Quiz results submitted successfully to Web3Forms');
+        return true;
+      } else {
+        if (isDev) console.error('Web3Forms submission failed:', result);
+        return false;
+      }
+    } catch (error) {
+      if (isDev) console.error('Error submitting quiz results to Web3Forms:', error);
+      return false;
+    }
   }
 
   function showResult() {
@@ -317,23 +439,26 @@
     if (percentage >= 85) { 
       resultEmoji = '🎉'; 
       resultMessage = 'Excellent Match!'; 
-      resultDescription = "Our values, lifestyle, and goals align wonderfully! I'd love to connect and explore this potential further. Let's have a conversation!"; 
+      resultDescription = `${userName}, our values, lifestyle, and goals align wonderfully! I'd love to connect and explore this potential further. Let's have a conversation!`; 
     }
     else if (percentage >= 70) { 
       resultEmoji = '😊'; 
       resultMessage = 'Great Compatibility!'; 
-      resultDescription = "We share many important values and preferences. Let's chat and see where it goes!"; 
+      resultDescription = `${userName}, we share many important values and preferences. Let's chat and see where it goes!`; 
     }
     else if (percentage >= 55) { 
       resultEmoji = '🤔'; 
       resultMessage = 'Good Potential!'; 
-      resultDescription = "We have some good alignment with room to learn more about each other. Worth exploring further through conversation!"; 
+      resultDescription = `${userName}, we have some good alignment with room to learn more about each other. Worth exploring further through conversation!`; 
     }
     else { 
       resultEmoji = '💭'; 
       resultMessage = 'Different Paths'; 
-      resultDescription = "While we might have different preferences, compatibility is complex. If you feel there's a connection, I'm open to conversation!"; 
+      resultDescription = `${userName}, while we might have different preferences, compatibility is complex. If you feel there's a connection, I'm open to conversation!`; 
     }
+
+    // Submit results to Web3Forms (async, doesn't block UI)
+    submitQuizResults(userName, percentage, answers, resultMessage);
 
     if (quizQuestions) quizQuestions.style.display = 'none';
     if (quizResult) {
