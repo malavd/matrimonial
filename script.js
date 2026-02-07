@@ -4,7 +4,7 @@
   // ===== CONSTANTS =====
   const isDev = ['localhost', '127.0.0.1'].includes(window.location.hostname);
   const UNLIMITED_SELECTIONS = Infinity;
-  const WEB3FORMS_ACCESS_KEY = '9dfc239b-cb71-4e34-838c-7cdaae4b0278';
+  const WEB3FORMS_ACCESS_KEY = 'e812d05b-2940-4006-b089-b14df29895e5';
 
   // ===== UTILITY FUNCTIONS =====
   function getTimestamp() {
