@@ -81,12 +81,12 @@ p {
   padding: 0 2rem;
 }
 
-/* ===== Theme Toggle ===== */
+/* ===== Theme Toggle - FIXED POSITIONING ===== */
 .theme-toggle {
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 10000;
+  z-index: 9998; /* Below navigation (9999) but above content */
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -189,6 +189,7 @@ p {
   background: none;
   border: none;
   cursor: pointer;
+  z-index: 10000; /* Above everything when menu is open */
 }
 
 .nav-burger span {
@@ -1128,6 +1129,7 @@ p {
   justify-content: center;
   transition: var(--transition-smooth);
   color: var(--text-dark);
+  z-index: 10002;
 }
 
 .modal-close:hover {
@@ -1165,6 +1167,7 @@ p {
   cursor: pointer;
   transition: var(--transition-smooth);
   background: var(--bg-light);
+  position: relative;
 }
 
 .quiz-option:hover {
@@ -1177,10 +1180,38 @@ p {
   background: rgba(212, 175, 55, 0.1);
 }
 
+.checkbox-indicator {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--primary-color);
+  border-radius: 4px;
+  transition: var(--transition-smooth);
+}
+
+.quiz-option.selected .checkbox-indicator {
+  background: var(--primary-color);
+}
+
+.quiz-option.selected .checkbox-indicator::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
 .quiz-nav {
   display: flex;
   justify-content: space-between;
   margin-top: 2rem;
+  gap: 1rem;
 }
 
 .quiz-btn {
@@ -1195,6 +1226,8 @@ p {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-family: inherit;
+  font-size: 1rem;
 }
 
 .quiz-btn:hover {
@@ -1236,6 +1269,12 @@ p {
 
 /* ===== Responsive Design ===== */
 @media (max-width: 968px) {
+  /* Move theme toggle to avoid nav collision */
+  .theme-toggle {
+    top: 85px; /* Below navigation bar */
+    right: 15px;
+  }
+
   .nav-menu {
     position: fixed;
     top: 70px;
@@ -1247,6 +1286,7 @@ p {
     padding: 2rem;
     box-shadow: var(--shadow-lg);
     transition: right 0.3s ease;
+    z-index: 9998;
   }
 
   .nav-menu.active {
@@ -1291,6 +1331,14 @@ p {
     font-size: 14px;
   }
 
+  /* Further adjust theme toggle on smaller screens */
+  .theme-toggle {
+    width: 45px;
+    height: 45px;
+    font-size: 1rem;
+    top: 75px;
+  }
+
   .hero {
     min-height: 80vh;
   }
@@ -1319,6 +1367,25 @@ p {
   .modal-content {
     padding: 2rem 1.5rem;
     width: 95%;
+  }
+
+  .quiz-nav {
+    flex-direction: column;
+  }
+
+  .quiz-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+    top: 70px;
+    right: 10px;
   }
 }
 
