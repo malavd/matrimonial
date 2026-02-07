@@ -1,7 +1,29 @@
 (function () {
   'use strict';
 
+  // ===== CONSTANTS =====
   const isDev = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+  const UNLIMITED_SELECTIONS = Infinity;
+  const WEB3FORMS_ACCESS_KEY = '9dfc239b-cb71-4e34-838c-7cdaae4b0278';
+
+  // ===== UTILITY FUNCTIONS =====
+  function getTimestamp() {
+    return new Date().toISOString();
+  }
+
+  function trackEvent(eventName, properties = {}) {
+    if (typeof posthog !== 'undefined') {
+      posthog.capture(eventName, { ...properties, timestamp: getTimestamp() });
+    }
+  }
+
+  function debounce(fn, wait) { 
+    let t; 
+    return (...args) => { 
+      clearTimeout(t); 
+      t = setTimeout(() => fn.apply(this, args), wait); 
+    }; 
+  }
 
   // ===== ERROR HANDLING =====
   window.addEventListener('error', (e) => {
@@ -21,11 +43,7 @@
       html.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
       updateThemeIcon(theme);
-      
-      // Track theme toggle in PostHog
-      if (typeof posthog !== 'undefined') {
-        posthog.capture('theme_toggled', { theme: theme });
-      }
+      trackEvent('theme_toggled', { theme: theme });
     });
   }
 
@@ -48,7 +66,11 @@
             line_linked: { enable: true, distance: 140, color: '#d4af37', opacity: 0.35, width: 1 },
             move: { enable: true, speed: 2, random: true, out_mode: 'out' }
           },
-          interactivity: { detect_on: 'canvas', events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' }, resize: true }, modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } } },
+          interactivity: { 
+            detect_on: 'canvas', 
+            events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' }, resize: true }, 
+            modes: { grab: { distance: 140, line_linked: { opacity: 1 } }, push: { particles_nb: 4 } } 
+          },
           retina_detect: true
         });
       } else if (isDev) {
@@ -68,22 +90,18 @@
   const heroContent = document.querySelector('.hero-content');
 
   // ===== QUIZ CONFIGURATION =====
-  // ** IMPORTANT: Replace 'YOUR_WEB3FORMS_ACCESS_KEY' with your actual Web3Forms access key **
-  const WEB3FORMS_ACCESS_KEY = '9dfc239b-cb71-4e34-838c-7cdaae4b0278';
-
-  // Quiz elements with updated selection rules
   const quizData = [
     { question: "What's your age range?", options: ["25-28", "28-31", "31-34", "34+"], weights: [0.5, 1, 1, 0.7], maxSelections: 1 },
     { question: "What's your educational background?", options: ["Undergraduate", "Master's", "PhD/Professional", "Other"], weights: [0.8, 1, 1, 0.6], maxSelections: 1 },
-    { question: "What's most important in a relationship?", options: ["Family values", "Career balance", "Personal growth", "Adventure & fun"], weights: [1, 0.9, 0.8, 0.7], maxSelections: 999 },
-    { question: "Your lifestyle preferences?", options: ["Vegetarian/Non-smoking", "Flexible diet", "Social drinker", "Party lifestyle"], weights: [1, 0.7, 0.5, 0.3], maxSelections: 999 },
+    { question: "What's most important in a relationship?", options: ["Family values", "Career balance", "Personal growth", "Adventure & fun"], weights: [1, 0.9, 0.8, 0.7], maxSelections: UNLIMITED_SELECTIONS },
+    { question: "Your lifestyle preferences?", options: ["Vegetarian/Non-smoking", "Flexible diet", "Social drinker", "Party lifestyle"], weights: [1, 0.7, 0.5, 0.3], maxSelections: UNLIMITED_SELECTIONS },
     { question: "How do you feel about living in the USA?", options: ["Love it, settled here", "Comfortable, occasional India visits", "Prefer India long-term", "Undecided"], weights: [1, 1, 0.6, 0.5], maxSelections: 1 },
     { question: "Your career aspirations?", options: ["Established career", "Growing career", "Entrepreneurial", "Career break/transition"], weights: [1, 0.9, 1, 0.7], maxSelections: 2 },
-    { question: "Hobbies and interests?", options: ["Sports & outdoors", "Cooking & food", "Reading & learning", "Travel & culture"], weights: [1, 1, 0.9, 0.9], maxSelections: 999 },
+    { question: "Hobbies and interests?", options: ["Sports & outdoors", "Cooking & food", "Reading & learning", "Travel & culture"], weights: [1, 1, 0.9, 0.9], maxSelections: UNLIMITED_SELECTIONS },
     { question: "Family dynamics preference?", options: ["Close-knit family", "Independent but connected", "Nuclear family focus", "Extended family"], weights: [1, 0.9, 0.8, 0.9], maxSelections: 1 }
   ];
 
-  let currentQuestion = -1; // Start at -1 to show name input first
+  let currentQuestion = -1;
   let answers = [];
   let userName = '';
   let quizStartTime = null;
@@ -102,12 +120,13 @@
   let sectionPositions = [];
 
   function computeSectionPositions() {
-    sectionPositions = sections.map(s => ({ id: s.id, top: s.offsetTop, height: s.clientHeight }));
+    sectionPositions = sections.map(s => ({ id: s.id, top: s.offsetTop }));
   }
 
   function handleScroll(scrollY) {
     if (navBar) {
-      if (scrollY > 100) navBar.classList.add('scrolled'); else navBar.classList.remove('scrolled');
+      if (scrollY > 100) navBar.classList.add('scrolled'); 
+      else navBar.classList.remove('scrolled');
     }
 
     if (heroContent) {
@@ -131,7 +150,6 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', debounce(() => computeSectionPositions(), 150), { passive: true });
 
-  // Initial compute
   computeSectionPositions();
 
   function updateActiveNavLink(scrollY = window.scrollY) {
@@ -149,21 +167,13 @@
     navBurger.addEventListener('click', () => {
       const open = navMenu.classList.toggle('active');
       navBurger.setAttribute('aria-expanded', String(open));
-      
-      // Track mobile menu toggle in PostHog
-      if (typeof posthog !== 'undefined') {
-        posthog.capture('mobile_menu_toggled', { opened: open });
-      }
+      trackEvent('mobile_menu_toggled', { opened: open });
     });
   }
 
   navLinks.forEach(link => link.addEventListener('click', (e) => { 
     const section = e.target.getAttribute('href');
-    
-    // Track navigation clicks in PostHog
-    if (typeof posthog !== 'undefined') {
-      posthog.capture('navigation_clicked', { section: section });
-    }
+    trackEvent('navigation_clicked', { section: section });
     
     if (navMenu) { 
       navMenu.classList.remove('active'); 
@@ -179,12 +189,25 @@
   function typeEffect() {
     if (!typingText) return;
     const currentPhrase = phrases[phraseIndex];
-    if (isDeleting) { typingText.textContent = currentPhrase.substring(0, charIndex - 1); charIndex--; }
-    else { typingText.textContent = currentPhrase.substring(0, charIndex + 1); charIndex++; }
+    
+    if (isDeleting) { 
+      typingText.textContent = currentPhrase.substring(0, charIndex - 1); 
+      charIndex--; 
+    } else { 
+      typingText.textContent = currentPhrase.substring(0, charIndex + 1); 
+      charIndex++; 
+    }
 
-    if (!isDeleting && charIndex === currentPhrase.length) { isDeleting = true; setTimeout(typeEffect, 2000); }
-    else if (isDeleting && charIndex === 0) { isDeleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; setTimeout(typeEffect, 500); }
-    else setTimeout(typeEffect, isDeleting ? 50 : 100);
+    if (!isDeleting && charIndex === currentPhrase.length) { 
+      isDeleting = true; 
+      setTimeout(typeEffect, 2000); 
+    } else if (isDeleting && charIndex === 0) { 
+      isDeleting = false; 
+      phraseIndex = (phraseIndex + 1) % phrases.length; 
+      setTimeout(typeEffect, 500); 
+    } else {
+      setTimeout(typeEffect, isDeleting ? 50 : 100);
+    }
   }
   setTimeout(typeEffect, 1000);
 
@@ -193,8 +216,12 @@
     if (typeof VanillaTilt !== 'undefined') {
       const tiltElements = document.querySelectorAll('[data-tilt]');
       if (tiltElements.length) VanillaTilt.init(tiltElements, { max: 15, speed: 400, glare: true, 'max-glare': 0.3 });
-    } else if (isDev) console.warn('VanillaTilt not loaded.');
-  } catch (err) { if (isDev) console.error('VanillaTilt failed:', err); }
+    } else if (isDev) {
+      console.warn('VanillaTilt not loaded.');
+    }
+  } catch (err) { 
+    if (isDev) console.error('VanillaTilt failed:', err); 
+  }
 
   // ===== INTERSECTION OBSERVER FOR AOS =====
   const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -100px 0px' };
@@ -231,114 +258,91 @@
   });
 
   // ===== QUIZ LOGIC =====
-  if (startQuizBtn) startQuizBtn.addEventListener('click', () => { 
-    quizModal?.classList.add('active'); 
-    resetQuiz(); 
-    showQuestion(); 
-    
-    // Track quiz start in PostHog
-    quizStartTime = Date.now();
-    if (typeof posthog !== 'undefined') {
-      posthog.capture('quiz_started', {
-        timestamp: new Date().toISOString()
-      });
-    }
-  });
-
-  if (closeQuizBtn && quizModal) closeQuizBtn.addEventListener('click', () => {
+  function handleQuizClose() {
     const wasCompleted = quizResult && quizResult.style.display !== 'none';
     
-    // Track quiz abandonment if not completed
-    if (!wasCompleted && currentQuestion >= 0 && typeof posthog !== 'undefined') {
-      posthog.capture('quiz_abandoned', {
+    if (!wasCompleted && currentQuestion >= 0) {
+      trackEvent('quiz_abandoned', {
         questions_answered: currentQuestion + 1,
-        total_questions: quizData.length,
-        timestamp: new Date().toISOString()
+        total_questions: quizData.length
       });
     }
     
     quizModal.classList.remove('active');
-  });
+  }
 
-  if (quizModal) quizModal.addEventListener('click', (e) => { 
-    if (e.target === quizModal) {
-      const wasCompleted = quizResult && quizResult.style.display !== 'none';
+  if (startQuizBtn) {
+    startQuizBtn.addEventListener('click', () => { 
+      quizModal?.classList.add('active'); 
+      resetQuiz(); 
+      showQuestion(); 
       
-      // Track quiz abandonment if not completed
-      if (!wasCompleted && currentQuestion >= 0 && typeof posthog !== 'undefined') {
-        posthog.capture('quiz_abandoned', {
-          questions_answered: currentQuestion + 1,
-          total_questions: quizData.length,
-          timestamp: new Date().toISOString()
-        });
-      }
-      
-      quizModal.classList.remove('active');
-    }
-  });
+      quizStartTime = Date.now();
+      trackEvent('quiz_started');
+    });
+  }
 
-  if (prevBtn) prevBtn.addEventListener('click', () => { 
-    if (currentQuestion > -1) { 
-      // Track going back
-      if (typeof posthog !== 'undefined') {
-        posthog.capture('quiz_question_back', {
+  if (closeQuizBtn && quizModal) {
+    closeQuizBtn.addEventListener('click', handleQuizClose);
+  }
+
+  if (quizModal) {
+    quizModal.addEventListener('click', (e) => { 
+      if (e.target === quizModal) handleQuizClose();
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => { 
+      if (currentQuestion > -1) { 
+        trackEvent('quiz_question_back', {
           from_question: currentQuestion + 1,
           to_question: currentQuestion
         });
-      }
-      
-      currentQuestion--; 
-      showQuestion(); 
-    } 
-  });
-
-  if (nextBtn) nextBtn.addEventListener('click', () => {
-    // Handle name input screen
-    if (currentQuestion === -1) {
-      const nameInput = document.getElementById('quizName');
-      if (nameInput && nameInput.value.trim()) {
-        userName = nameInput.value.trim();
         
-        // Track name submission
-        if (typeof posthog !== 'undefined') {
-          posthog.capture('quiz_name_submitted', {
-            name_length: userName.length
-          });
+        currentQuestion--; 
+        showQuestion(); 
+      } 
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      if (currentQuestion === -1) {
+        const nameInput = document.getElementById('quizName');
+        if (nameInput && nameInput.value.trim()) {
+          userName = nameInput.value.trim();
+          trackEvent('quiz_name_submitted', { name_length: userName.length });
+          currentQuestion++;
+          showQuestion();
+        } else {
+          alert('Please enter your name to continue');
         }
-        
-        currentQuestion++;
-        showQuestion();
-      } else {
-        alert('Please enter your name to continue');
+        return;
       }
-      return;
-    }
 
-    // Handle quiz questions
-    const hasSelection = answers[currentQuestion] && answers[currentQuestion].length > 0;
-    
-    if (hasSelection) {
-      // Track question answered
-      if (typeof posthog !== 'undefined') {
+      const hasSelection = answers[currentQuestion] && answers[currentQuestion].length > 0;
+      
+      if (hasSelection) {
         const question = quizData[currentQuestion];
-        posthog.capture('quiz_question_answered', {
+        trackEvent('quiz_question_answered', {
           question_number: currentQuestion + 1,
           question_text: question.question,
           selections_count: answers[currentQuestion].length,
-          max_allowed: question.maxSelections >= 999 ? 'unlimited' : question.maxSelections
+          max_allowed: question.maxSelections === UNLIMITED_SELECTIONS ? 'unlimited' : question.maxSelections
         });
-      }
-      
-      if (currentQuestion < quizData.length - 1) { 
-        currentQuestion++; 
-        showQuestion(); 
+        
+        if (currentQuestion < quizData.length - 1) { 
+          currentQuestion++; 
+          showQuestion(); 
+        } else {
+          showResult();
+        }
       } else {
-        showResult();
+        alert('Please select at least one option');
       }
-    } else {
-      alert('Please select at least one option');
-    }
-  });
+    });
+  }
 
   function resetQuiz() { 
     currentQuestion = -1; 
@@ -351,7 +355,6 @@
   }
 
   function showQuestion() {
-    // Show name input screen first
     if (currentQuestion === -1) {
       if (quizQuestions) {
         quizQuestions.innerHTML = `
@@ -369,13 +372,10 @@
           </div>
         `;
         
-        // Add Enter key support
         const nameInput = document.getElementById('quizName');
         if (nameInput) {
           nameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-              nextBtn?.click();
-            }
+            if (e.key === 'Enter') nextBtn?.click();
           });
         }
       }
@@ -385,13 +385,11 @@
       return;
     }
 
-    // Show quiz questions
     const question = quizData[currentQuestion];
     const maxSelections = question.maxSelections || 1;
-    const isUnlimited = maxSelections >= 999;
+    const isUnlimited = maxSelections === UNLIMITED_SELECTIONS;
     const isMultiple = maxSelections > 1;
     
-    // Generate instruction text
     let instructionText = '';
     if (isUnlimited) {
       instructionText = '<p style="font-size: 0.9rem; color: var(--gold); margin-bottom: 1rem;">Select all that apply</p>';
@@ -419,7 +417,6 @@
         </div>
       `;
       
-      // Handle option clicks with flexible multi-select logic
       document.querySelectorAll('.quiz-option').forEach(option => {
         option.addEventListener('click', () => {
           const index = parseInt(option.dataset.index, 10);
@@ -429,25 +426,20 @@
           }
           
           if (maxSelections === 1) {
-            // Single selection - clear all and select one
             document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
             option.classList.add('selected');
             answers[currentQuestion] = [index];
           } else {
-            // Multi-selection logic (limited or unlimited)
             const currentSelections = answers[currentQuestion];
             const indexPos = currentSelections.indexOf(index);
             
             if (indexPos > -1) {
-              // Deselect if already selected
               currentSelections.splice(indexPos, 1);
               option.classList.remove('selected');
             } else if (isUnlimited || currentSelections.length < maxSelections) {
-              // Select if under limit or unlimited
               currentSelections.push(index);
               option.classList.add('selected');
             } else {
-              // Show message if limit reached (only for limited multi-select)
               alert(`You can select up to ${maxSelections} options only`);
             }
           }
@@ -459,11 +451,7 @@
     if (nextBtn) nextBtn.innerHTML = currentQuestion === quizData.length - 1 ? 'See Results <i class="fas fa-check"></i>' : 'Next <i class="fas fa-arrow-right"></i>';
   }
 
-  // Submit quiz results to Web3Forms
   async function submitQuizResults(userName, percentage, answers, resultMessage) {
-    const timestamp = new Date().toISOString();
-    
-    // Format answers for readable email
     const formattedAnswers = answers.map((selectedIndices, questionIndex) => {
       const question = quizData[questionIndex];
       const selectedOptions = selectedIndices.map(idx => question.options[idx]).join(', ');
@@ -477,7 +465,7 @@
       participant_name: userName,
       quiz_score: `${percentage}%`,
       result_message: resultMessage,
-      timestamp: timestamp,
+      timestamp: getTimestamp(),
       detailed_answers: formattedAnswers
     };
 
@@ -506,6 +494,26 @@
     }
   }
 
+  function attachResultEventListeners() {
+    const ctaBtn = quizResult.querySelector('.cta-contact');
+    const retakeBtn = quizResult.querySelector('.retake-quiz');
+
+    if (ctaBtn) {
+      ctaBtn.addEventListener('click', () => {
+        quizModal.classList.remove('active');
+        trackEvent('cta_clicked', { source: 'quiz_result', action: 'contact' });
+      });
+    }
+
+    if (retakeBtn) {
+      retakeBtn.addEventListener('click', () => {
+        trackEvent('quiz_retake_clicked');
+        resetQuiz();
+        showQuestion();
+      });
+    }
+  }
+
   function showResult() {
     let totalScore = 0;
     let maxPossibleScore = 0;
@@ -514,7 +522,6 @@
       const question = quizData[questionIndex];
       
       if (selectedIndices && selectedIndices.length > 0) {
-        // Calculate average score for multi-selections
         const questionScore = selectedIndices.reduce((sum, idx) => {
           return sum + (question.weights[idx] || 0);
         }, 0) / selectedIndices.length;
@@ -522,7 +529,6 @@
         totalScore += questionScore;
       }
       
-      // Max score is the highest weight for each question
       maxPossibleScore += Math.max(...question.weights);
     });
     
@@ -534,41 +540,33 @@
       resultEmoji = '🎉'; 
       resultMessage = 'Excellent Match!'; 
       resultDescription = `${userName}, our values, lifestyle, and goals align wonderfully! I'd love to connect and explore this potential further. Let's have a conversation!`; 
-    }
-    else if (percentage >= 70) { 
+    } else if (percentage >= 70) { 
       resultEmoji = '😊'; 
       resultMessage = 'Great Compatibility!'; 
       resultDescription = `${userName}, we share many important values and preferences. Let's chat and see where it goes!`; 
-    }
-    else if (percentage >= 55) { 
+    } else if (percentage >= 55) { 
       resultEmoji = '🤔'; 
       resultMessage = 'Good Potential!'; 
       resultDescription = `${userName}, we have some good alignment with room to learn more about each other. Worth exploring further through conversation!`; 
-    }
-    else { 
+    } else { 
       resultEmoji = '💭'; 
       resultMessage = 'Different Paths'; 
       resultDescription = `${userName}, while we might have different preferences, compatibility is complex. If you feel there's a connection, I'm open to conversation!`; 
     }
 
-    // Submit results to Web3Forms (async, doesn't block UI)
     submitQuizResults(userName, percentage, answers, resultMessage);
 
-    // Track quiz completion in PostHog with detailed data
     if (typeof posthog !== 'undefined') {
-      // Identify the user with their name
       posthog.identify(userName, {
         name: userName,
         quiz_completed: true
       });
       
-      // Capture the completion event with rich data
-      posthog.capture('quiz_completed', {
+      trackEvent('quiz_completed', {
         participant_name: userName,
         score: percentage,
         result_category: resultMessage,
         duration_seconds: quizDuration,
-        timestamp: new Date().toISOString(),
         answers_summary: answers.map((selectedIndices, idx) => ({
           question_number: idx + 1,
           question: quizData[idx].question,
@@ -587,10 +585,16 @@
         <div class="result-score">${percentage}%</div>
         <p style="font-size: 1.1rem; color: var(--text-light); margin: 2rem 0;">${resultDescription}</p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="#contact" class="quiz-btn quiz-btn-primary" onclick="document.getElementById('quizModal').classList.remove('active'); if (typeof posthog !== 'undefined') { posthog.capture('cta_clicked', { source: 'quiz_result', action: 'contact' }); }">Get in Touch <i class="fas fa-envelope"></i></a>
-          <button type="button" class="quiz-btn" onclick="location.reload(); if (typeof posthog !== 'undefined') { posthog.capture('quiz_retake_clicked'); }">Retake Quiz <i class="fas fa-redo"></i></button>
+          <a href="#contact" class="quiz-btn quiz-btn-primary cta-contact">
+            Get in Touch <i class="fas fa-envelope"></i>
+          </a>
+          <button type="button" class="quiz-btn retake-quiz">
+            Retake Quiz <i class="fas fa-redo"></i>
+          </button>
         </div>
       `;
+      
+      attachResultEventListeners();
     }
   }
 
@@ -604,14 +608,10 @@
       const phone = document.getElementById('phone')?.value || '';
       const message = document.getElementById('message')?.value || '';
       
-      // Track contact form submission in PostHog
-      if (typeof posthog !== 'undefined') {
-        posthog.capture('contact_form_submitted', {
-          has_phone: !!phone,
-          message_length: message.length,
-          timestamp: new Date().toISOString()
-        });
-      }
+      trackEvent('contact_form_submitted', {
+        has_phone: !!phone,
+        message_length: message.length
+      });
       
       const subject = encodeURIComponent(`Matrimonial Inquiry from ${name}`);
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\nMessage:\n${message}`);
@@ -621,31 +621,21 @@
     });
   }
 
-  // ===== IMAGE LAZY OBSERVER (for data-src patterns, preserved) =====
-  if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry.isIntersecting) { const img = entry.target; if (img.dataset.src) { img.src = img.dataset.src; img.removeAttribute('data-src'); imageObserver.unobserve(img); } } }); });
-    document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
-  }
-
   // ===== EASTER EGG: Konami Code =====
   const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   let konamiIndex = 0;
+  
   document.addEventListener('keydown', (e) => { 
     if (e.key === konamiCode[konamiIndex]) { 
       konamiIndex++; 
       if (konamiIndex === konamiCode.length) { 
         activateEasterEgg(); 
         konamiIndex = 0;
-        
-        // Track easter egg discovery
-        if (typeof posthog !== 'undefined') {
-          posthog.capture('easter_egg_discovered', {
-            type: 'konami_code',
-            timestamp: new Date().toISOString()
-          });
-        }
+        trackEvent('easter_egg_discovered', { type: 'konami_code' });
       } 
-    } else konamiIndex = 0; 
+    } else {
+      konamiIndex = 0; 
+    }
   });
   
   function activateEasterEgg() { 
@@ -656,41 +646,30 @@
     }, 2000); 
   }
 
-  // Add rainbow animation style
   const styleEl = document.createElement('style');
   styleEl.textContent = `@keyframes rainbow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }`;
   document.head.appendChild(styleEl);
 
   // ===== PAGE VISIBILITY TRACKING =====
   if (typeof posthog !== 'undefined') {
-    // Track when user leaves/returns to tab
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
-        posthog.capture('page_hidden', {
-          timestamp: new Date().toISOString()
-        });
+        trackEvent('page_hidden');
       } else {
-        posthog.capture('page_visible', {
-          timestamp: new Date().toISOString()
-        });
+        trackEvent('page_visible');
       }
     });
     
-    // Track time spent on page when leaving
     window.addEventListener('beforeunload', () => {
-      posthog.capture('page_exit', {
-        timestamp: new Date().toISOString()
-      });
+      trackEvent('page_exit');
     });
   }
 
+  // ===== DEVELOPMENT CONSOLE MESSAGES =====
   if (isDev) {
     console.log('%c👋 Welcome to my profile!', 'font-size: 20px; color: #d4af37; font-weight: bold;');
     console.log('%cLooking for your perfect match? Let\'s connect!', 'font-size: 14px; color: #666;');
     console.log('%c📊 PostHog analytics enabled', 'font-size: 12px; color: #1d4ed8;');
   }
-
-  // ===== Utilities =====
-  function debounce(fn, wait) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), wait); }; }
 
 })();
