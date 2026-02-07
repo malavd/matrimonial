@@ -21,6 +21,11 @@
       html.setAttribute('data-theme', theme);
       localStorage.setItem('theme', theme);
       updateThemeIcon(theme);
+      
+      // Track theme toggle in PostHog
+      if (typeof posthog !== 'undefined') {
+        posthog.capture('theme_toggled', { theme: theme });
+      }
     });
   }
 
@@ -81,6 +86,7 @@
   let currentQuestion = -1; // Start at -1 to show name input first
   let answers = [];
   let userName = '';
+  let quizStartTime = null;
 
   const quizModal = document.getElementById('quizModal');
   const startQuizBtn = document.getElementById('startQuiz');
@@ -143,10 +149,27 @@
     navBurger.addEventListener('click', () => {
       const open = navMenu.classList.toggle('active');
       navBurger.setAttribute('aria-expanded', String(open));
+      
+      // Track mobile menu toggle in PostHog
+      if (typeof posthog !== 'undefined') {
+        posthog.capture('mobile_menu_toggled', { opened: open });
+      }
     });
   }
 
-  navLinks.forEach(link => link.addEventListener('click', () => { if (navMenu) { navMenu.classList.remove('active'); navBurger?.setAttribute('aria-expanded', 'false'); } }));
+  navLinks.forEach(link => link.addEventListener('click', (e) => { 
+    const section = e.target.getAttribute('href');
+    
+    // Track navigation clicks in PostHog
+    if (typeof posthog !== 'undefined') {
+      posthog.capture('navigation_clicked', { section: section });
+    }
+    
+    if (navMenu) { 
+      navMenu.classList.remove('active'); 
+      navBurger?.setAttribute('aria-expanded', 'false'); 
+    } 
+  }));
 
   // ===== TYPING EFFECT =====
   const typingText = document.querySelector('.typing-text');
@@ -208,12 +231,62 @@
   });
 
   // ===== QUIZ LOGIC =====
-  if (startQuizBtn) startQuizBtn.addEventListener('click', () => { quizModal?.classList.add('active'); resetQuiz(); showQuestion(); });
-  if (closeQuizBtn && quizModal) closeQuizBtn.addEventListener('click', () => quizModal.classList.remove('active'));
-  if (quizModal) quizModal.addEventListener('click', (e) => { if (e.target === quizModal) quizModal.classList.remove('active'); });
+  if (startQuizBtn) startQuizBtn.addEventListener('click', () => { 
+    quizModal?.classList.add('active'); 
+    resetQuiz(); 
+    showQuestion(); 
+    
+    // Track quiz start in PostHog
+    quizStartTime = Date.now();
+    if (typeof posthog !== 'undefined') {
+      posthog.capture('quiz_started', {
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  if (closeQuizBtn && quizModal) closeQuizBtn.addEventListener('click', () => {
+    const wasCompleted = quizResult && quizResult.style.display !== 'none';
+    
+    // Track quiz abandonment if not completed
+    if (!wasCompleted && currentQuestion >= 0 && typeof posthog !== 'undefined') {
+      posthog.capture('quiz_abandoned', {
+        questions_answered: currentQuestion + 1,
+        total_questions: quizData.length,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    quizModal.classList.remove('active');
+  });
+
+  if (quizModal) quizModal.addEventListener('click', (e) => { 
+    if (e.target === quizModal) {
+      const wasCompleted = quizResult && quizResult.style.display !== 'none';
+      
+      // Track quiz abandonment if not completed
+      if (!wasCompleted && currentQuestion >= 0 && typeof posthog !== 'undefined') {
+        posthog.capture('quiz_abandoned', {
+          questions_answered: currentQuestion + 1,
+          total_questions: quizData.length,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
+      quizModal.classList.remove('active');
+    }
+  });
 
   if (prevBtn) prevBtn.addEventListener('click', () => { 
     if (currentQuestion > -1) { 
+      // Track going back
+      if (typeof posthog !== 'undefined') {
+        posthog.capture('quiz_question_back', {
+          from_question: currentQuestion + 1,
+          to_question: currentQuestion
+        });
+      }
+      
       currentQuestion--; 
       showQuestion(); 
     } 
@@ -225,6 +298,14 @@
       const nameInput = document.getElementById('quizName');
       if (nameInput && nameInput.value.trim()) {
         userName = nameInput.value.trim();
+        
+        // Track name submission
+        if (typeof posthog !== 'undefined') {
+          posthog.capture('quiz_name_submitted', {
+            name_length: userName.length
+          });
+        }
+        
         currentQuestion++;
         showQuestion();
       } else {
@@ -237,6 +318,17 @@
     const hasSelection = answers[currentQuestion] && answers[currentQuestion].length > 0;
     
     if (hasSelection) {
+      // Track question answered
+      if (typeof posthog !== 'undefined') {
+        const question = quizData[currentQuestion];
+        posthog.capture('quiz_question_answered', {
+          question_number: currentQuestion + 1,
+          question_text: question.question,
+          selections_count: answers[currentQuestion].length,
+          max_allowed: question.maxSelections >= 999 ? 'unlimited' : question.maxSelections
+        });
+      }
+      
       if (currentQuestion < quizData.length - 1) { 
         currentQuestion++; 
         showQuestion(); 
@@ -252,6 +344,7 @@
     currentQuestion = -1; 
     answers = []; 
     userName = '';
+    quizStartTime = null;
     if (quizQuestions) quizQuestions.style.display = 'block'; 
     if (quizResult) quizResult.style.display = 'none'; 
     if (nextBtn) nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>'; 
@@ -434,6 +527,7 @@
     });
     
     const percentage = Math.round((totalScore / (maxPossibleScore || 1)) * 100);
+    const quizDuration = quizStartTime ? Math.round((Date.now() - quizStartTime) / 1000) : null;
 
     let resultMessage, resultEmoji, resultDescription;
     if (percentage >= 85) { 
@@ -460,6 +554,30 @@
     // Submit results to Web3Forms (async, doesn't block UI)
     submitQuizResults(userName, percentage, answers, resultMessage);
 
+    // Track quiz completion in PostHog with detailed data
+    if (typeof posthog !== 'undefined') {
+      // Identify the user with their name
+      posthog.identify(userName, {
+        name: userName,
+        quiz_completed: true
+      });
+      
+      // Capture the completion event with rich data
+      posthog.capture('quiz_completed', {
+        participant_name: userName,
+        score: percentage,
+        result_category: resultMessage,
+        duration_seconds: quizDuration,
+        timestamp: new Date().toISOString(),
+        answers_summary: answers.map((selectedIndices, idx) => ({
+          question_number: idx + 1,
+          question: quizData[idx].question,
+          selections_count: selectedIndices.length,
+          selected_options: selectedIndices.map(i => quizData[idx].options[i])
+        }))
+      });
+    }
+
     if (quizQuestions) quizQuestions.style.display = 'none';
     if (quizResult) {
       quizResult.style.display = 'block';
@@ -469,8 +587,8 @@
         <div class="result-score">${percentage}%</div>
         <p style="font-size: 1.1rem; color: var(--text-light); margin: 2rem 0;">${resultDescription}</p>
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-          <a href="#contact" class="quiz-btn quiz-btn-primary" onclick="document.getElementById('quizModal').classList.remove('active')">Get in Touch <i class="fas fa-envelope"></i></a>
-          <button type="button" class="quiz-btn" onclick="location.reload()">Retake Quiz <i class="fas fa-redo"></i></button>
+          <a href="#contact" class="quiz-btn quiz-btn-primary" onclick="document.getElementById('quizModal').classList.remove('active'); if (typeof posthog !== 'undefined') { posthog.capture('cta_clicked', { source: 'quiz_result', action: 'contact' }); }">Get in Touch <i class="fas fa-envelope"></i></a>
+          <button type="button" class="quiz-btn" onclick="location.reload(); if (typeof posthog !== 'undefined') { posthog.capture('quiz_retake_clicked'); }">Retake Quiz <i class="fas fa-redo"></i></button>
         </div>
       `;
     }
@@ -485,6 +603,16 @@
       const email = document.getElementById('email')?.value || '';
       const phone = document.getElementById('phone')?.value || '';
       const message = document.getElementById('message')?.value || '';
+      
+      // Track contact form submission in PostHog
+      if (typeof posthog !== 'undefined') {
+        posthog.capture('contact_form_submitted', {
+          has_phone: !!phone,
+          message_length: message.length,
+          timestamp: new Date().toISOString()
+        });
+      }
+      
       const subject = encodeURIComponent(`Matrimonial Inquiry from ${name}`);
       const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\nMessage:\n${message}`);
       window.location.href = `mailto:malavdalal@yahoo.com?subject=${subject}&body=${body}`;
@@ -502,17 +630,64 @@
   // ===== EASTER EGG: Konami Code =====
   const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   let konamiIndex = 0;
-  document.addEventListener('keydown', (e) => { if (e.key === konamiCode[konamiIndex]) { konamiIndex++; if (konamiIndex === konamiCode.length) { activateEasterEgg(); konamiIndex = 0; } } else konamiIndex = 0; });
-  function activateEasterEgg() { document.body.style.animation = 'rainbow 2s linear infinite'; setTimeout(() => { document.body.style.animation = ''; alert('🎮 You found the secret! Thanks for being playful! 😄'); }, 2000); }
+  document.addEventListener('keydown', (e) => { 
+    if (e.key === konamiCode[konamiIndex]) { 
+      konamiIndex++; 
+      if (konamiIndex === konamiCode.length) { 
+        activateEasterEgg(); 
+        konamiIndex = 0;
+        
+        // Track easter egg discovery
+        if (typeof posthog !== 'undefined') {
+          posthog.capture('easter_egg_discovered', {
+            type: 'konami_code',
+            timestamp: new Date().toISOString()
+          });
+        }
+      } 
+    } else konamiIndex = 0; 
+  });
+  
+  function activateEasterEgg() { 
+    document.body.style.animation = 'rainbow 2s linear infinite'; 
+    setTimeout(() => { 
+      document.body.style.animation = ''; 
+      alert('🎮 You found the secret! Thanks for being playful! 😄'); 
+    }, 2000); 
+  }
 
   // Add rainbow animation style
   const styleEl = document.createElement('style');
   styleEl.textContent = `@keyframes rainbow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }`;
   document.head.appendChild(styleEl);
 
+  // ===== PAGE VISIBILITY TRACKING =====
+  if (typeof posthog !== 'undefined') {
+    // Track when user leaves/returns to tab
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        posthog.capture('page_hidden', {
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        posthog.capture('page_visible', {
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+    
+    // Track time spent on page when leaving
+    window.addEventListener('beforeunload', () => {
+      posthog.capture('page_exit', {
+        timestamp: new Date().toISOString()
+      });
+    });
+  }
+
   if (isDev) {
     console.log('%c👋 Welcome to my profile!', 'font-size: 20px; color: #d4af37; font-weight: bold;');
     console.log('%cLooking for your perfect match? Let\'s connect!', 'font-size: 14px; color: #666;');
+    console.log('%c📊 PostHog analytics enabled', 'font-size: 12px; color: #1d4ed8;');
   }
 
   // ===== Utilities =====
