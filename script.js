@@ -64,15 +64,16 @@
 
   // Quiz elements
   const quizData = [
-    { question: "What's your age range?", options: ["25-28", "28-31", "31-34", "34+"], weights: [0.5, 1, 1, 0.7] },
-    { question: "What's your educational background?", options: ["Undergraduate", "Master's", "PhD/Professional", "Other"], weights: [0.8, 1, 1, 0.6] },
-    { question: "What's most important in a relationship?", options: ["Family values", "Career balance", "Personal growth", "Adventure & fun"], weights: [1, 0.9, 0.8, 0.7] },
-    { question: "Your lifestyle preferences?", options: ["Vegetarian/Non-smoking", "Flexible diet", "Social drinker", "Party lifestyle"], weights: [1, 0.7, 0.5, 0.3] },
-    { question: "How do you feel about living in the USA?", options: ["Love it, settled here", "Comfortable, occasional India visits", "Prefer India long-term", "Undecided"], weights: [1, 1, 0.6, 0.5] },
-    { question: "Your career aspirations?", options: ["Established career", "Growing career", "Entrepreneurial", "Career break/transition"], weights: [1, 0.9, 1, 0.7] },
-    { question: "Hobbies and interests?", options: ["Sports & outdoors", "Cooking & food", "Reading & learning", "Travel & culture"], weights: [1, 1, 0.9, 0.9] },
-    { question: "Family dynamics preference?", options: ["Close-knit family", "Independent but connected", "Nuclear family focus", "Extended family"], weights: [1, 0.9, 0.8, 0.9] }
+    { question: "What's your age range?", options: ["25-28", "28-31", "31-34", "34+"], weights: [0.5, 1, 1, 0.7], maxSelections: 1 },
+    { question: "What's your educational background?", options: ["Undergraduate", "Master's", "PhD/Professional", "Other"], weights: [0.8, 1, 1, 0.6], maxSelections: 1 },
+    { question: "What's most important in a relationship? (Select up to 2)", options: ["Family values", "Career balance", "Personal growth", "Adventure & fun"], weights: [1, 0.9, 0.8, 0.7], maxSelections: 2 },
+    { question: "Your lifestyle preferences? (Select up to 2)", options: ["Vegetarian/Non-smoking", "Flexible diet", "Social drinker", "Party lifestyle"], weights: [1, 0.7, 0.5, 0.3], maxSelections: 2 },
+    { question: "How do you feel about living in the USA?", options: ["Love it, settled here", "Comfortable, occasional India visits", "Prefer India long-term", "Undecided"], weights: [1, 1, 0.6, 0.5], maxSelections: 1 },
+    { question: "Your career aspirations? (Select up to 2)", options: ["Established career", "Growing career", "Entrepreneurial", "Career break/transition"], weights: [1, 0.9, 1, 0.7], maxSelections: 2 },
+    { question: "Hobbies and interests? (Select up to 2)", options: ["Sports & outdoors", "Cooking & food", "Reading & learning", "Travel & culture"], weights: [1, 1, 0.9, 0.9], maxSelections: 2 },
+    { question: "Family dynamics preference? (Select up to 2)", options: ["Close-knit family", "Independent but connected", "Nuclear family focus", "Extended family"], weights: [1, 0.9, 0.8, 0.9], maxSelections: 2 }
   ];
+
 
   let currentQuestion = 0;
   let answers = [];
@@ -209,41 +210,144 @@
 
   if (prevBtn) prevBtn.addEventListener('click', () => { if (currentQuestion > 0) { currentQuestion--; showQuestion(); } });
   if (nextBtn) nextBtn.addEventListener('click', () => {
-    const selected = document.querySelector('.quiz-option.selected');
-    if (selected) {
-      answers[currentQuestion] = parseInt(selected.dataset.index, 10);
-      if (currentQuestion < quizData.length - 1) { currentQuestion++; showQuestion(); } else showResult();
-    } else alert('Please select an option');
+    const hasSelection = answers[currentQuestion] && answers[currentQuestion].length > 0;
+    
+    if (hasSelection) {
+      if (currentQuestion < quizData.length - 1) { 
+        currentQuestion++; 
+        showQuestion(); 
+      } else {
+        showResult();
+      }
+    } else {
+      const maxSelections = quizData[currentQuestion].maxSelections || 1;
+      alert(`Please select at least one option (up to ${maxSelections} allowed)`);
+    }
   });
 
   function resetQuiz() { currentQuestion = 0; answers = []; if (quizQuestions) quizQuestions.style.display = 'block'; if (quizResult) quizResult.style.display = 'none'; if (nextBtn) nextBtn.innerHTML = 'Next <i class="fas fa-arrow-right"></i>'; }
 
   function showQuestion() {
     const question = quizData[currentQuestion];
+    const maxSelections = question.maxSelections || 1;
+    
     if (quizQuestions) {
-      quizQuestions.innerHTML = `\n      <div class="quiz-question">\n        <h3>Question ${currentQuestion + 1} of ${quizData.length}</h3>\n        <p style="font-size: 1.2rem; margin: 1rem 0 2rem;">${question.question}</p>\n        <div class="quiz-options">\n          ${question.options.map((option, index) => `\n            <div class="quiz-option ${answers[currentQuestion] === index ? 'selected' : ''}" data-index="${index}">${option}</div>\n          `).join('')}\n        </div>\n      </div>\n      `;
-      document.querySelectorAll('.quiz-option').forEach(option => option.addEventListener('click', () => { document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected')); option.classList.add('selected'); }));
+      quizQuestions.innerHTML = `
+        <div class="quiz-question">
+          <h3>Question ${currentQuestion + 1} of ${quizData.length}</h3>
+          <p style="font-size: 1.2rem; margin: 1rem 0 2rem;">${question.question}</p>
+          ${maxSelections > 1 ? `<p style="font-size: 0.9rem; color: var(--gold); margin-bottom: 1rem;">Select up to ${maxSelections} options</p>` : ''}
+          <div class="quiz-options">
+            ${question.options.map((option, index) => {
+              const isSelected = answers[currentQuestion] && answers[currentQuestion].includes(index);
+              return `
+                <div class="quiz-option ${isSelected ? 'selected' : ''}" data-index="${index}">
+                  ${option}
+                  ${maxSelections > 1 ? '<span class="checkbox-indicator"></span>' : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+      
+      // Handle option clicks with multi-select logic
+      document.querySelectorAll('.quiz-option').forEach(option => {
+        option.addEventListener('click', () => {
+          const index = parseInt(option.dataset.index, 10);
+          
+          if (!answers[currentQuestion]) {
+            answers[currentQuestion] = [];
+          }
+          
+          if (maxSelections === 1) {
+            // Single selection - clear all and select one
+            document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            answers[currentQuestion] = [index];
+          } else {
+            // Multi-selection logic
+            const currentSelections = answers[currentQuestion];
+            const indexPos = currentSelections.indexOf(index);
+            
+            if (indexPos > -1) {
+              // Deselect if already selected
+              currentSelections.splice(indexPos, 1);
+              option.classList.remove('selected');
+            } else if (currentSelections.length < maxSelections) {
+              // Select if under limit
+              currentSelections.push(index);
+              option.classList.add('selected');
+            } else {
+              // Show message if limit reached
+              alert(`You can select up to ${maxSelections} options only`);
+            }
+          }
+        });
+      });
     }
+    
     if (prevBtn) prevBtn.style.display = currentQuestion === 0 ? 'none' : 'flex';
     if (nextBtn) nextBtn.innerHTML = currentQuestion === quizData.length - 1 ? 'See Results <i class="fas fa-check"></i>' : 'Next <i class="fas fa-arrow-right"></i>';
   }
 
   function showResult() {
     let totalScore = 0;
-    answers.forEach((answerIndex, questionIndex) => { totalScore += quizData[questionIndex].weights[answerIndex] || 0; });
-    const maxScore = quizData.reduce((sum, q) => sum + Math.max(...q.weights), 0);
-    const percentage = Math.round((totalScore / (maxScore || 1)) * 100);
+    let maxPossibleScore = 0;
+    
+    answers.forEach((selectedIndices, questionIndex) => {
+      const question = quizData[questionIndex];
+      
+      if (selectedIndices && selectedIndices.length > 0) {
+        // Calculate average score for multi-selections
+        const questionScore = selectedIndices.reduce((sum, idx) => {
+          return sum + (question.weights[idx] || 0);
+        }, 0) / selectedIndices.length;
+        
+        totalScore += questionScore;
+      }
+      
+      // Max score is the highest weight for each question
+      maxPossibleScore += Math.max(...question.weights);
+    });
+    
+    const percentage = Math.round((totalScore / (maxPossibleScore || 1)) * 100);
 
     let resultMessage, resultEmoji, resultDescription;
-    if (percentage >= 85) { resultEmoji = '🎉'; resultMessage = 'Excellent Match!'; resultDescription = "Our values, lifestyle, and goals align wonderfully! I'd love to connect and explore this potential further. Let's have a conversation!"; }
-    else if (percentage >= 70) { resultEmoji = '😊'; resultMessage = 'Great Compatibility!'; resultDescription = "We share many important values and preferences. Let's chat and see where it goes!"; }
-    else if (percentage >= 55) { resultEmoji = '🤔'; resultMessage = 'Good Potential!'; resultDescription = "We have some good alignment with room to learn more about each other. Worth exploring further through conversation!"; }
-    else { resultEmoji = '💭'; resultMessage = 'Different Paths'; resultDescription = "While we might have different preferences, compatibility is complex. If you feel there's a connection, I'm open to conversation!"; }
+    if (percentage >= 85) { 
+      resultEmoji = '🎉'; 
+      resultMessage = 'Excellent Match!'; 
+      resultDescription = "Our values, lifestyle, and goals align wonderfully! I'd love to connect and explore this potential further. Let's have a conversation!"; 
+    }
+    else if (percentage >= 70) { 
+      resultEmoji = '😊'; 
+      resultMessage = 'Great Compatibility!'; 
+      resultDescription = "We share many important values and preferences. Let's chat and see where it goes!"; 
+    }
+    else if (percentage >= 55) { 
+      resultEmoji = '🤔'; 
+      resultMessage = 'Good Potential!'; 
+      resultDescription = "We have some good alignment with room to learn more about each other. Worth exploring further through conversation!"; 
+    }
+    else { 
+      resultEmoji = '💭'; 
+      resultMessage = 'Different Paths'; 
+      resultDescription = "While we might have different preferences, compatibility is complex. If you feel there's a connection, I'm open to conversation!"; 
+    }
 
     if (quizQuestions) quizQuestions.style.display = 'none';
     if (quizResult) {
       quizResult.style.display = 'block';
-      quizResult.innerHTML = `\n        <div style="font-size: 5rem; margin-bottom: 1rem;">${resultEmoji}</div>\n        <h3>${resultMessage}</h3>\n        <div class="result-score">${percentage}%</div>\n        <p style="font-size: 1.1rem; color: var(--text-light); margin: 2rem 0;">${resultDescription}</p>\n        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">\n          <a href="#contact" class="quiz-btn quiz-btn-primary" onclick="document.getElementById('quizModal').classList.remove('active')">Get in Touch <i class=\"fas fa-envelope\"></i></a>\n          <button type=\"button\" class=\"quiz-btn\" onclick=\"location.reload()\">Retake Quiz <i class=\"fas fa-redo\"></i></button>\n        </div>\n      `;
+      quizResult.innerHTML = `
+        <div style="font-size: 5rem; margin-bottom: 1rem;">${resultEmoji}</div>
+        <h3>${resultMessage}</h3>
+        <div class="result-score">${percentage}%</div>
+        <p style="font-size: 1.1rem; color: var(--text-light); margin: 2rem 0;">${resultDescription}</p>
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+          <a href="#contact" class="quiz-btn quiz-btn-primary" onclick="document.getElementById('quizModal').classList.remove('active')">Get in Touch <i class="fas fa-envelope"></i></a>
+          <button type="button" class="quiz-btn" onclick="location.reload()">Retake Quiz <i class="fas fa-redo"></i></button>
+        </div>
+      `;
     }
   }
 
