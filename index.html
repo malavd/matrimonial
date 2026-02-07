@@ -18,21 +18,19 @@
     api_host: 'https://us.i.posthog.com',
     person_profiles: 'identified_only',
     capture_pageview: true,
-    capture_pageleave: true,
-    autocapture: false,  // Disable autocapture to reduce API calls
-    disable_session_recording: true,  // Disable session recording to avoid 401s
+    
+    // Disable features causing 401 errors
+    autocapture: false,
+    disable_session_recording: true,
+    disable_surveys: true,
+    advanced_disable_decide: true,  // Disable feature flags and experiments
+    
     loaded: function(posthog) {
-        console.log('PostHog loaded successfully');
-    },
-    _onCapture: function(event, props) {
-        // Debug captured events
-        if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
-            console.log('PostHog captured:', event, props);
-        }
+        console.log('✅ PostHog loaded successfully');
     }
 })
-
   </script>
+
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
   
@@ -554,7 +552,7 @@
     </div>
   </div>
 
-    <!-- Scripts -->
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js" crossorigin="anonymous"></script>
   <script src="./script.js"></script>
