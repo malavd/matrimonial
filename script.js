@@ -18,7 +18,7 @@
           color:#f5f5f5;
         ">
           <div>
-            <h1 style="font-size:2rem;margin-bottom:1rem;">This site is temporarily unavailable as Malav is already taken</h1>
+            <h1 style="font-size:2rem;margin-bottom:1rem;">This site is indefinitely unavailable as Malav is already taken</h1>
             <p style="font-size:1rem;opacity:0.8;">
               Please check back later after 7 birth cycles.
             </p>
