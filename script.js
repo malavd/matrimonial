@@ -1,3 +1,38 @@
+// QUICK DEACTIVATION SWITCH
+(function () {
+  const SITE_DISABLED = true; // toggle to false to re‑enable "const SITE_DISABLED = false;"
+
+
+  if (SITE_DISABLED) {
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.innerHTML = `
+        <div style="
+          min-height:100vh;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          text-align:center;
+          font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+          padding:2rem;
+          background:#111;
+          color:#f5f5f5;
+        ">
+          <div>
+            <h1 style="font-size:2rem;margin-bottom:1rem;">This site is temporarily unavailable</h1>
+            <p style="font-size:1rem;opacity:0.8;">
+              Please check back later.
+            </p>
+          </div>
+        </div>
+      `;
+    });
+
+    // Hard break so nothing else runs
+    throw new Error('Site is disabled');
+  }
+})();
+
+
 (function () {
   'use strict';
 
