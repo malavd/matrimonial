@@ -1,6 +1,6 @@
 // QUICK DEACTIVATION SWITCH
 (function () {
-  const SITE_DISABLED = true; // toggle to false to re‑enable "const SITE_DISABLED = false;"
+  const SITE_DISABLED = false; // toggle to false to re‑enable "const SITE_DISABLED = false;"
 
 
   if (SITE_DISABLED) {
